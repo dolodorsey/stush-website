@@ -89,6 +89,31 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* LOGOS */}
+      <section style={{ padding: 'clamp(40px,5vw,64px) clamp(16px,3vw,48px)', background: 'var(--bg)', borderTop: '1px solid var(--tx03)', borderBottom: '1px solid var(--tx03)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 'clamp(16px,2vw,32px)', maxWidth: 1100, margin: '0 auto', alignItems: 'center', justifyItems: 'center' }}>
+          {[
+            '/brand/StushW.png',
+            '/brand/STUSH_COLLEGE.png',
+            '/brand/RED.png',
+            '/brand/STUSH2.png',
+            '/brand/STUSH_OLYPICS.png',
+            '/brand/stushsss.png',
+            '/brand/ST.png',
+            '/brand/STUSH4.png',
+            '/brand/STUSH3.png',
+            '/brand/STUSSS_.png',
+            '/brand/STUSH.png',
+            '/brand/STUSH0.png',
+          ].map((src, i) => (
+            <a key={i} href="/shop" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', aspectRatio: '1', padding: 'clamp(12px,2vw,24px)', transition: 'transform 0.5s var(--lux)' }}
+              onMouseEnter={undefined}>
+              <img src={src} alt="" loading="lazy" style={{ maxHeight: 'clamp(56px,7vw,90px)', maxWidth: '100%', width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 2px 12px rgba(0,0,0,0.4))' }} />
+            </a>
+          ))}
+        </div>
+      </section>
+
       {/* MANIFESTO */}
       <section className="manifesto">
         <p className="manifesto__text">

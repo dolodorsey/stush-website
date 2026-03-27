@@ -1,54 +1,146 @@
-'use client';
+import { getProducts, formatPrice } from '@/lib/shopify';
 
-import { KHGFormButton } from '../../components/KHGForms';
+export const dynamic = 'force-dynamic';
+const S = 'https://stushusa.myshopify.com';
 
-export default function Home() {
+const COLLECTIONS = [
+  { title: 'Outerwear', href: `${S}/collections/outerwear`, key: 'Outerwear' },
+  { title: 'Blazers & Suits', href: `${S}/collections/blazers-suits`, key: 'Blazers & Suits' },
+  { title: 'Tops', href: `${S}/collections/tops`, key: 'Tops' },
+  { title: 'Accessories', href: `${S}/collections/accessories`, key: 'Accessories' },
+  { title: 'Denim & Trousers', href: `${S}/collections/denim-trousers`, key: 'Denim & Trousers' },
+  { title: 'Sets', href: `${S}/collections/sets-1`, key: 'Sets' },
+];
+
+function FeaturedCard({ p }) {
+  const img = p.images?.[0]?.src;
+  const pr = p.variants?.[0]?.price;
+  const vid = p.variants?.[0]?.id;
+  if (!img) return null;
   return (
-    <main style={{ minHeight: '100vh', background: '#080808' }}>
-      <section style={{
-        minHeight: '80vh', display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-        padding: '0 24px',
-      }}>
-        <h1 style={{
-          fontFamily: '"Cormorant Garamond", serif',
-          fontSize: 'clamp(48px, 12vw, 140px)', fontWeight: 300,
-          letterSpacing: '-0.04em', lineHeight: 0.95, margin: 0, color: '#fff',
-        }}>
-          Stush
-        </h1>
-        <p style={{
-          fontSize: 'clamp(13px, 1.4vw, 16px)', color: 'rgba(255,255,255,0.4)',
-          marginTop: 20, maxWidth: 420, lineHeight: 1.6,
-        }}>
-          Part of The Kollective Hospitality Group
+    <a href={`${S}/products/${p.handle}`} className="dc">
+      <div className="dc__wrap">
+        <img src={img} alt={p.title} className="dc__img" loading="lazy" />
+        <a href={`${S}/cart/${vid}:1`} className="dc__cta">Add to Cart</a>
+      </div>
+      <div className="dc__info">
+        <div className="dc__name">{p.title}</div>
+        <div className="dc__price">{formatPrice(pr)}</div>
+      </div>
+    </a>
+  );
+}
+
+export default async function HomePage() {
+  const products = await getProducts();
+
+  // Get featured products (first from key categories)
+  const featured = [];
+  const categories = ['Outerwear', 'Blazers & Suits', 'Tops', 'Accessories'];
+  categories.forEach(cat => {
+    const items = products.filter(p => p.product_type === cat);
+    featured.push(...items.slice(0, 3));
+  });
+
+  // Build category counts
+  const byType = {};
+  products.forEach(p => {
+    const t = p.product_type || 'Other';
+    if (!byType[t]) byType[t] = [];
+    byType[t].push(p);
+  });
+
+  // Get first product image per collection for covers
+  const collectionCovers = COLLECTIONS.map(c => {
+    const items = byType[c.key] || [];
+    const coverProduct = items[0];
+    return { ...c, img: coverProduct?.images?.[0]?.src, count: items.length };
+  }).filter(c => c.count > 0);
+
+  return (
+    <>
+      {/* HERO */}
+      <section className="hero">
+        {/* Placeholder — Dr. Dorsey will upload hero video/image */}
+        <div className="hero__bg" style={{
+          background: 'linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 50%, #131313 100%)',
+          position: 'absolute', inset: 0
+        }} />
+        <div className="hero__overlay" />
+        <div className="hero__content">
+          <div className="hero__tag">2026 Collection</div>
+          <h1 className="hero__title">Stush<br /><em>Luxury</em></h1>
+          <p className="hero__sub">Elevated streetwear and designer fashion for the culture. Where luxury meets the streets. Every piece is a statement.</p>
+          <div className="hero__actions">
+            <a href="/shop" className="btn-primary">Shop the Collection</a>
+            <a href={`${S}/collections/all-products`} className="btn-secondary">View All</a>
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURED PRODUCTS */}
+      <section className="shop" style={{ borderTop: '1px solid var(--tx03)' }}>
+        <div className="shop__header">
+          <h2 className="shop__title">Featured Pieces</h2>
+          <a href="/shop" className="shop__link">View All {products.length} Pieces &rarr;</a>
+        </div>
+        <div className="dgrid">
+          {featured.slice(0, 10).map(p => <FeaturedCard key={p.id} p={p} />)}
+        </div>
+      </section>
+
+      {/* MANIFESTO */}
+      <section className="manifesto">
+        <p className="manifesto__text">
+          This isn&rsquo;t fast fashion. This isn&rsquo;t basic. This is <strong>elevated streetwear</strong> for the ones who understand
+          that style is a language. <strong>Every piece tells a story. Make yours worth hearing.</strong>
         </p>
-        <div style={{ display: 'flex', gap: 12, marginTop: 40, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <KHGFormButton formType="inquiry" brandKey="stush" variant="accent" size="lg" label="Get In Touch" />
-          <KHGFormButton formType="sponsor" brandKey="stush" variant="outline" size="lg" />
+      </section>
+
+      {/* COLLECTIONS */}
+      <section className="collections">
+        <div className="collections__header">
+          <div className="section-tag">Shop by Category</div>
+          <h2 className="section-title">The Collections</h2>
+        </div>
+        <div className="collections__grid">
+          {collectionCovers.map((c, i) => (
+            <a key={i} href={c.href} className="col-card">
+              <div className="col-card__img">
+                {c.img ? (
+                  <img src={c.img} alt={c.title} loading="lazy" />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', background: 'var(--s2)' }} />
+                )}
+              </div>
+              <div className="col-card__info">
+                <span className="col-card__title">{c.title}</span>
+                <span className="col-card__count">{c.count}</span>
+              </div>
+            </a>
+          ))}
         </div>
       </section>
-      <section style={{ padding: '80px 24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <h2 style={{
-            fontFamily: '"Cormorant Garamond", serif',
-            fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 300, color: '#fff',
-          }}>
-            Connect With Us
-          </h2>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14, marginTop: 8 }}>
-            See all options on our <a href="/connect" style={{ color: '#FF6B35', textDecoration: 'none' }}>connect page</a>.
-          </p>
-        </div>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', maxWidth: 800, margin: '0 auto' }}>
-          <KHGFormButton formType="inquiry" brandKey="stush" />
-          <KHGFormButton formType="consultation" brandKey="stush" />
-          <KHGFormButton formType="hiring_inquiry" brandKey="stush" />
-          <KHGFormButton formType="volunteer" brandKey="stush" />
-          <KHGFormButton formType="rsvp" brandKey="stush" />
-          <KHGFormButton formType="nda" brandKey="stush" />
+
+      {/* MARQUEE */}
+      <section className="marquee">
+        <div className="marquee__track">
+          {[...Array(6)].map((_, i) => (
+            <span key={i} className="marquee__item">LUXURY IS A LIFESTYLE &bull; ELEVATED STREETWEAR &bull; STUSH &bull; THE KOLLECTIVE &bull;</span>
+          ))}
         </div>
       </section>
-    </main>
+
+      {/* EMAIL CAPTURE */}
+      <section className="movement" id="subscribe">
+        <div className="movement__tag">Join the Movement</div>
+        <h2 className="movement__title">First Dibs on Drops</h2>
+        <p className="movement__desc">Exclusive access to new collections, limited drops, and insider-only pricing.</p>
+        <div className="movement__form">
+          <input type="email" className="movement__input" placeholder="Enter your email" />
+          <button className="movement__submit">Join</button>
+        </div>
+      </section>
+    </>
   );
 }

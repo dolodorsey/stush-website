@@ -4,12 +4,15 @@ export const dynamic = 'force-dynamic';
 const S = 'https://stushusa.myshopify.com';
 
 const COLLECTIONS = [
+  { title: 'New Arrivals', href: `${S}/collections/new-arrivals`, key: 'new-arrival-tag' },
   { title: 'Outerwear', href: `${S}/collections/outerwear`, key: 'Outerwear' },
   { title: 'Blazers & Suits', href: `${S}/collections/blazers-suits`, key: 'Blazers & Suits' },
   { title: 'Tops', href: `${S}/collections/tops`, key: 'Tops' },
   { title: 'Accessories', href: `${S}/collections/accessories`, key: 'Accessories' },
   { title: 'Denim & Trousers', href: `${S}/collections/denim-trousers`, key: 'Denim & Trousers' },
   { title: 'Sets', href: `${S}/collections/sets-1`, key: 'Sets' },
+  { title: 'Hoodies & Sweatshirts', href: `${S}/collections/hoodies-sweatshirts`, key: 'hoodies-tag' },
+  { title: 'Premium Collection', href: `${S}/collections/premium`, key: 'premium-tag' },
 ];
 
 function FeaturedCard({ p }) {

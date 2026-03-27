@@ -16,10 +16,12 @@ const SHOPIFY = 'https://stushusa.myshopify.com';
 
 const NAV = [
   { label: 'Shop All', href: '/shop' },
+  { label: 'New Arrivals', href: `${SHOPIFY}/collections/new-arrivals` },
   { label: 'Outerwear', href: `${SHOPIFY}/collections/outerwear` },
   { label: 'Blazers', href: `${SHOPIFY}/collections/blazers-suits` },
   { label: 'Tops', href: `${SHOPIFY}/collections/tops` },
   { label: 'Accessories', href: `${SHOPIFY}/collections/accessories` },
+  { label: 'Under $300', href: `${SHOPIFY}/collections/under-300` },
 ];
 
 export default function RootLayout({ children }) {
@@ -58,12 +60,16 @@ export default function RootLayout({ children }) {
             </div>
             <div>
               <div className="footer__heading">Shop</div>
+              <a href={`${SHOPIFY}/collections/new-arrivals`} className="footer__link">New Arrivals</a>
               <a href={`${SHOPIFY}/collections/outerwear`} className="footer__link">Outerwear</a>
               <a href={`${SHOPIFY}/collections/blazers-suits`} className="footer__link">Blazers & Suits</a>
               <a href={`${SHOPIFY}/collections/tops`} className="footer__link">Tops</a>
+              <a href={`${SHOPIFY}/collections/hoodies-sweatshirts`} className="footer__link">Hoodies & Sweatshirts</a>
+              <a href={`${SHOPIFY}/collections/jackets-bombers`} className="footer__link">Jackets & Bombers</a>
               <a href={`${SHOPIFY}/collections/denim-trousers`} className="footer__link">Denim & Trousers</a>
               <a href={`${SHOPIFY}/collections/accessories`} className="footer__link">Accessories</a>
-              <a href={`${SHOPIFY}/collections/sets-1`} className="footer__link">Sets</a>
+              <a href={`${SHOPIFY}/collections/premium`} className="footer__link">Premium Collection</a>
+              <a href={`${SHOPIFY}/collections/under-300`} className="footer__link">Under $300</a>
             </div>
             <div>
               <div className="footer__heading">Info</div>

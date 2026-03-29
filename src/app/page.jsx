@@ -64,11 +64,15 @@ export default async function HomePage() {
     <>
       {/* HERO */}
       <section className="hero">
-        {/* Placeholder — Dr. Dorsey will upload hero video/image */}
-        <div className="hero__bg" style={{
-          background: 'linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 50%, #131313 100%)',
-          position: 'absolute', inset: 0
-        }} />
+        <video
+          className="hero__bg"
+          src="https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/STUSH_VID.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+        />
         <div className="hero__overlay" />
         <div className="hero__content">
           <div className="hero__tag">2026 Collection</div>

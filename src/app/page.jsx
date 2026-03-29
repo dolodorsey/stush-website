@@ -85,6 +85,15 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* MOVING BANNER */}
+      <div className="announce">
+        <div className="announce__track">
+          {[...Array(8)].map((_, i) => (
+            <span key={i} className="announce__item">LUXURY IS A LIFESTYLE &bull; FREE SHIPPING ON ORDERS $250+ &bull;</span>
+          ))}
+        </div>
+      </div>
+
       {/* FEATURED PRODUCTS */}
       <section className="shop" style={{ borderTop: '1px solid var(--tx03)' }}>
         <div className="shop__header">

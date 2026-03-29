@@ -28,15 +28,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        {/* ANNOUNCEMENT BAR */}
-        <div className="announce">
-          <div className="announce__track">
-            {[...Array(8)].map((_, i) => (
-              <span key={i} className="announce__item">LUXURY IS A LIFESTYLE &bull; FREE SHIPPING ON ORDERS $250+ &bull;</span>
-            ))}
-          </div>
-        </div>
-
         <nav className="nav">
           <a href="/" className="nav__logo">Stush</a>
           <ul className="nav__links">

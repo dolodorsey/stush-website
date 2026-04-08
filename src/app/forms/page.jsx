@@ -1,3 +1,12 @@
 'use client';
-import { redirect } from 'next/navigation';
-export default function FormsIndex() { return redirect('/forms/index'); }
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
+// Redirect /forms → /forms/index which renders the full forms grid
+export default function FormsIndex() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace('/forms/index');
+  }, [router]);
+  return null;
+}

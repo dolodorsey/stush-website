@@ -1,74 +1,79 @@
-import { getProducts } from '@/lib/shopify';
-import ColorCycleCard from '@/components/ColorCycleCard';
+import { getProducts, getCollections, getCollectionProducts } from '@/lib/shopify';
+import CurtainCard from '@/components/CurtainCard';
 
 export const dynamic = 'force-dynamic';
-const S = 'https://stushusa.myshopify.com';
+export const metadata = { title: 'Shop All — STUSH' };
 
-const CATEGORIES = [
-  { key: 'Outerwear', label: 'Outerwear', id: 'outerwear' },
-  { key: 'Blazers & Suits', label: 'Blazers & Suits', id: 'blazers' },
-  { key: 'Tops', label: 'Tops', id: 'tops' },
-  { key: 'Accessories', label: 'Accessories', id: 'accessories' },
-  { key: 'Denim & Trousers', label: 'Denim & Trousers', id: 'denim' },
-  { key: 'Sets', label: 'Sets', id: 'sets' },
+const SECTIONS = [
+  { handle: 'the-outerwear-vault', label: 'Outerwear Vault' },
+  { handle: 'the-blazer-room',     label: 'Blazer Room' },
+  { handle: 'the-tops-gallery',    label: 'Tops Gallery' },
+  { handle: 'the-denim-archive',   label: 'Denim Archive' },
+  { handle: 'the-accessories-lab', label: 'Accessories Lab' },
+  { handle: 'the-sets-edit',       label: 'Sets Edit' },
 ];
 
-const COLLECTION_HANDLES = {
-  outerwear: 'the-outerwear-vault',
-  blazers: 'the-blazer-room',
-  tops: 'the-tops-gallery',
-  accessories: 'the-accessories-lab',
-  denim: 'the-denim-archive',
-  sets: 'the-sets-edit',
-};
-
 export default async function ShopPage() {
-  const products = await getProducts();
-  const byType = {};
-  (products || []).forEach(p => {
-    const t = p.product_type || 'Other';
-    if (!byType[t]) byType[t] = [];
-    byType[t].push(p);
-  });
+  const collections = await getCollections();
+
+  const sections = await Promise.all(
+    SECTIONS.map(async (sec) => {
+      const col = collections.find(c => c.handle === sec.handle);
+      if (!col) return { ...sec, products: [] };
+      const products = await getCollectionProducts(col.id, 12);
+      return { ...sec, products };
+    })
+  );
 
   return (
     <>
-      <section className="shop-nav">
-        <div className="shop-nav__inner">
-          {CATEGORIES.map(cat => {
-            const count = (byType[cat.key] || []).length;
-            return count > 0 ? (
-              <a key={cat.id} href={`#${cat.id}`} className="shop-nav__link">
-                {cat.label} <span className="shop-nav__count">({count})</span>
-              </a>
-            ) : null;
-          })}
-          <a href={`${S}/collections/all-products`} className="shop-nav__link shop-nav__link--shopify">
-            Shopify Store &rarr;
-          </a>
-        </div>
-      </section>
+      <header className="page-head">
+        <span className="page-head__crumb">
+          <a href="/">Stush</a> / Shop
+        </span>
+        <h1 className="page-head__title">
+          Shop <em>All</em>
+        </h1>
+      </header>
 
-      {CATEGORIES.map(cat => {
-        const items = byType[cat.key] || [];
-        if (items.length === 0) return null;
-        const handle = COLLECTION_HANDLES[cat.id] || cat.id;
-        return (
-          <section key={cat.id} id={cat.id} className="shop">
-            <div className="shop__header">
-              <h2 className="shop__title">{cat.label} &mdash; {items.length}</h2>
-              <a href={`${S}/collections/${handle}`} className="shop__link">
-                View on Shopify &rarr;
+      {/* Quick-jump nav */}
+      <nav style={{
+        display: 'flex', gap: 24, flexWrap: 'wrap',
+        padding: '20px var(--gutter)',
+        borderBottom: '1px solid var(--bass-line)',
+      }}>
+        {SECTIONS.map(sec => (
+          <a
+            key={sec.handle}
+            href={`#${sec.handle}`}
+            className="eyebrow"
+            style={{ transition: 'color var(--t-quick)' }}
+          >
+            {sec.label}
+          </a>
+        ))}
+      </nav>
+
+      {sections.map(sec => (
+        sec.products.length > 0 && (
+          <section key={sec.handle} id={sec.handle} className="product-section">
+            <div className="product-section__head">
+              <h2 className="collection-strip__title" style={{ fontSize: 'clamp(28px, 4vw, 52px)' }}>
+                {sec.label.split(' ').slice(0, -1).join(' ')}{' '}
+                <em>{sec.label.split(' ').pop()}</em>
+              </h2>
+              <a href={`/collections/${sec.handle}`} className="eyebrow eyebrow--gold" style={{ paddingBottom: 6 }}>
+                View All →
               </a>
             </div>
-            <div className="dgrid">
-              {items.map(p => (
-                <ColorCycleCard key={p.id} product={p} storeUrl={S} />
+            <div className="product-grid">
+              {sec.products.map((p, i) => (
+                <CurtainCard key={p.id} product={p} priority={i < 4} />
               ))}
             </div>
           </section>
-        );
-      })}
+        )
+      ))}
     </>
   );
 }

@@ -1,184 +1,210 @@
-import { getProducts, formatPrice } from '@/lib/shopify';
+import { getProducts, getCollections, getCollectionProducts, formatPrice, SHOP_URL } from '@/lib/shopify';
+import CurtainCard from '@/components/CurtainCard';
 
-export const dynamic = 'force-dynamic';
-const S = 'https://stushusa.myshopify.com';
-
-const COLLECTIONS = [
-  { title: 'New Arrivals',          href: `${S}/collections/the-arrivals`,         key: 'new-arrival-tag' },
-  { title: 'Outerwear',             href: `${S}/collections/the-outerwear-vault`,  key: 'Outerwear' },
-  { title: 'Blazers & Suits',       href: `${S}/collections/the-blazer-room`,      key: 'Blazers & Suits' },
-  { title: 'Tops',                  href: `${S}/collections/the-tops-gallery`,     key: 'Tops' },
-  { title: 'Accessories',           href: `${S}/collections/the-accessories-lab`,  key: 'Accessories' },
-  { title: 'Denim & Trousers',      href: `${S}/collections/the-denim-archive`,    key: 'Denim & Trousers' },
-  { title: 'Sets',                  href: `${S}/collections/the-sets-edit`,        key: 'Sets' },
-  { title: 'Shop All',              href: `${S}/collections/all-products`,         key: 'all-products' },
+const COLLECTION_DISPLAY = [
+  { handle: 'the-outerwear-vault', display: 'Outerwear', accent: 'Vault' },
+  { handle: 'the-blazer-room',     display: 'Blazer',    accent: 'Room' },
+  { handle: 'the-tops-gallery',    display: 'Tops',      accent: 'Gallery' },
+  { handle: 'the-accessories-lab', display: 'Accessories',accent: 'Lab' },
 ];
 
-function FeaturedCard({ p }) {
-  const img = p.images?.[0]?.src;
-  const pr = p.variants?.[0]?.price;
-  const vid = p.variants?.[0]?.id;
-  if (!img) return null;
-  return (
-    <a href={`${S}/products/${p.handle}`} className="dc">
-      <div className="dc__wrap">
-        <img src={img} alt={p.title} className="dc__img" loading="lazy" />
-        <a href={`${S}/cart/${vid}:1`} className="dc__cta">Add to Cart</a>
-      </div>
-      <div className="dc__info">
-        <div className="dc__name">{p.title}</div>
-        <div className="dc__price">{formatPrice(pr)}</div>
-      </div>
-    </a>
-  );
-}
-
 export default async function HomePage() {
-  const products = await getProducts();
+  const [allProducts, allCollections] = await Promise.all([
+    getProducts({ limit: 250 }),
+    getCollections(),
+  ]);
 
-  // Get featured products (first from key categories)
-  const featured = [];
-  const categories = ['Outerwear', 'Blazers & Suits', 'Tops', 'Accessories'];
-  categories.forEach(cat => {
-    const items = products.filter(p => p.product_type === cat);
-    featured.push(...items.slice(0, 3));
-  });
+  // Hero product — highest-priced with an image
+  const sorted = [...allProducts]
+    .filter(p => p.images?.length)
+    .sort((a, b) => parseFloat(b.variants?.[0]?.price || 0) - parseFloat(a.variants?.[0]?.price || 0));
+  const hero = sorted[0];
+  const heroImg = hero?.images?.[0]?.src;
 
-  // Build category counts
-  const byType = {};
-  products.forEach(p => {
-    const t = p.product_type || 'Other';
-    if (!byType[t]) byType[t] = [];
-    byType[t].push(p);
-  });
+  // Collection strip — get product counts + first image per collection
+  const stripData = await Promise.all(
+    COLLECTION_DISPLAY.map(async (cd) => {
+      const col = allCollections.find(c => c.handle === cd.handle);
+      if (!col) return { ...cd, count: 0, img: null, id: null };
+      const products = await getCollectionProducts(col.id, 4);
+      const img = products?.[0]?.images?.[0]?.src || col.image?.src || null;
+      return { ...cd, count: products.length, img, id: col.id };
+    })
+  );
 
-  // Get first product image per collection for covers
-  const collectionCovers = COLLECTIONS.map(c => {
-    const items = byType[c.key] || [];
-    const coverProduct = items[0];
-    return { ...c, img: coverProduct?.images?.[0]?.src, count: items.length };
-  }).filter(c => c.count > 0);
+  // Featured products — best sellers by position, first 8 with 2+ images (for curtain effect)
+  const featured = allProducts
+    .filter(p => (p.images?.length || 0) >= 2)
+    .slice(0, 12);
 
   return (
     <>
-      {/* HERO */}
+      {/* ═══════ 1. HERO ═══════ */}
       <section className="hero">
-        <video
-          className="hero__bg"
-          src="https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/STUSH_VID.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-        />
+        {heroImg && <img src={heroImg} alt="" className="hero__bg fadeIn" />}
         <div className="hero__overlay" />
-        <div className="hero__content">
-          <div className="hero__tag">2026 Collection</div>
-          <h1 className="hero__title">Stush<br /><em>Luxury</em></h1>
-          <p className="hero__sub">Elevated streetwear and designer fashion for the culture. Where luxury meets the streets. Every piece is a statement.</p>
-          <div className="hero__actions">
-            <a href="/shop" className="btn-primary">Shop the Collection</a>
-            <a href={`${S}/collections/all-products`} className="btn-secondary">View All</a>
+        <div className="hero__inner">
+          <div>
+            <div className="hero__meta fadeUp">
+              <span className="eyebrow eyebrow--gold">SS &bull; 26 Collection</span>
+            </div>
+            <h1 className="hero__title fadeUp-2">
+              dressed for<br />
+              <em><span className="hero__title-accent">THE</span> room</em>
+            </h1>
+          </div>
+          <div className="hero__sidebar fadeUp-3">
+            <p className="hero__sub">
+              An editorial house from Atlanta. Statement pieces, runway-grade construction,
+              and the confidence to wear it all.
+            </p>
+            <div className="hero__actions">
+              <a href="/shop" className="btn-primary">Enter the Empire</a>
+              <a href="/lookbook" className="btn-ghost">Lookbook</a>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* MOVING BANNER */}
-      <div className="announce">
-        <div className="announce__track">
-          {[...Array(8)].map((_, i) => (
-            <span key={i} className="announce__item">LUXURY IS A LIFESTYLE &bull; FREE SHIPPING ON ORDERS $250+ &bull;</span>
-          ))}
-        </div>
-      </div>
-
-      {/* FEATURED PRODUCTS */}
-      <section className="shop" style={{ borderTop: '1px solid var(--tx03)' }}>
-        <div className="shop__header">
-          <h2 className="shop__title">Featured Pieces</h2>
-          <a href="/shop" className="shop__link">View All {products.length} Pieces &rarr;</a>
-        </div>
-        <div className="dgrid">
-          {featured.slice(0, 10).map(p => <FeaturedCard key={p.id} p={p} />)}
-        </div>
-      </section>
-
-      {/* LOGOS */}
-      <section style={{ padding: 'clamp(40px,5vw,64px) clamp(16px,3vw,48px)', background: 'var(--bg)', borderTop: '1px solid var(--tx03)', borderBottom: '1px solid var(--tx03)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 'clamp(16px,2vw,32px)', maxWidth: 1100, margin: '0 auto', alignItems: 'center', justifyItems: 'center' }}>
-          {[
-            '/brand/StushW.png',
-            '/brand/STUSH_COLLEGE.png',
-            '/brand/RED.png',
-            '/brand/STUSH2.png',
-            '/brand/STUSH_OLYPICS.png',
-            '/brand/stushsss.png',
-            '/brand/ST.png',
-            '/brand/STUSH4.png',
-            '/brand/STUSH3.png',
-            '/brand/STUSSS_.png',
-            '/brand/STUSH.png',
-            '/brand/STUSH0.png',
-          ].map((src, i) => (
-            <a key={i} href="/shop" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', aspectRatio: '1', padding: 'clamp(12px,2vw,24px)', transition: 'transform 0.5s var(--lux)' }}
-              onMouseEnter={undefined}>
-              <img src={src} alt="" loading="lazy" style={{ maxHeight: 'clamp(56px,7vw,90px)', maxWidth: '100%', width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 2px 12px rgba(0,0,0,0.4))' }} />
-            </a>
+      {/* ═══════ 2. MARQUEE STRIP ═══════ */}
+      <section className="marquee-section" aria-hidden="true">
+        <div className="marquee-track">
+          {[0,1].map(loop => (
+            <span key={loop}>
+              {['Outerwear', 'Blazers', 'Denim', 'Accessories', 'Sets', 'Atelier', 'Editorial', 'Atlanta'].map(w => (
+                <span className="marquee-item" key={loop + w}>{w}</span>
+              ))}
+            </span>
           ))}
         </div>
       </section>
 
-      {/* MANIFESTO */}
-      <section className="manifesto">
-        <p className="manifesto__text">
-          This isn&rsquo;t fast fashion. This isn&rsquo;t basic. This is <strong>elevated streetwear</strong> for the ones who understand
-          that style is a language. <strong>Every piece tells a story. Make yours worth hearing.</strong>
-        </p>
-      </section>
-
-      {/* COLLECTIONS */}
-      <section className="collections">
-        <div className="collections__header">
-          <div className="section-tag">Shop by Category</div>
-          <h2 className="section-title">The Collections</h2>
+      {/* ═══════ 3. COLLECTION STRIP ═══════ */}
+      <section className="collection-strip">
+        <div className="collection-strip__head">
+          <h2 className="collection-strip__title">
+            The <em>Collections</em>
+          </h2>
+          <a href="/collections" className="eyebrow eyebrow--gold" style={{ paddingBottom: 6 }}>
+            View All →
+          </a>
         </div>
-        <div className="collections__grid">
-          {collectionCovers.map((c, i) => (
-            <a key={i} href={c.href} className="col-card">
-              <div className="col-card__img">
-                {c.img ? (
-                  <img src={c.img} alt={c.title} loading="lazy" />
-                ) : (
-                  <div style={{ width: '100%', height: '100%', background: 'var(--s2)' }} />
-                )}
-              </div>
-              <div className="col-card__info">
-                <span className="col-card__title">{c.title}</span>
-                <span className="col-card__count">{c.count}</span>
+        <div className="collection-strip__grid">
+          {stripData.map(cd => (
+            <a
+              key={cd.handle}
+              href={`/collections/${cd.handle}`}
+              className="collection-card"
+            >
+              {cd.img && (
+                <img
+                  src={cd.img}
+                  alt={cd.display}
+                  className="collection-card__img"
+                  loading="lazy"
+                />
+              )}
+              <div className="collection-card__veil" />
+              <div className="collection-card__copy">
+                <div className="collection-card__name">
+                  {cd.display} <em>{cd.accent}</em>
+                </div>
+                <div className="collection-card__count">
+                  {cd.count}+ pieces
+                </div>
               </div>
             </a>
           ))}
         </div>
       </section>
 
-      {/* MARQUEE */}
-      <section className="marquee">
-        <div className="marquee__track">
-          {[...Array(6)].map((_, i) => (
-            <span key={i} className="marquee__item">LUXURY IS A LIFESTYLE &bull; ELEVATED STREETWEAR &bull; STUSH &bull; THE KOLLECTIVE &bull;</span>
+      {/* ═══════ 4. STORY ═══════ */}
+      <section className="story">
+        <div className="story__inner">
+          <span className="eyebrow story__eyebrow">The Story</span>
+          <h2 className="story__head">
+            We don&rsquo;t make <em>clothes</em>.<br />
+            We make <span className="accent">entrances</span>.
+          </h2>
+          <div className="story__body">
+            <p>
+              <strong>STUSH started with a single blazer and a city that never asked permission.</strong>{' '}
+              Atlanta raised us — the music, the hustle, the rooms you have to earn your way into.
+              Every piece is designed for that moment when the door opens and the conversation stops.
+            </p>
+            <p>
+              Runway-grade construction. Street-born attitude. Limited runs because the room
+              isn&rsquo;t for everyone. This isn&rsquo;t fashion — it&rsquo;s armor for people
+              who already know who they are.
+            </p>
+          </div>
+          <div className="story__signature">
+            <span className="story__sig-text">Dr. Dorsey</span>
+            <span className="meta story__sig-meta">— Founder &amp; Creative Director</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ 5. PRODUCT GRID (CURTAIN CARDS) ═══════ */}
+      <section className="product-section">
+        <div className="product-section__head">
+          <h2 className="collection-strip__title">
+            Featured <em>Pieces</em>
+          </h2>
+          <a href="/shop" className="eyebrow eyebrow--gold" style={{ paddingBottom: 6 }}>
+            Shop All →
+          </a>
+        </div>
+        <div className="product-grid">
+          {featured.map((p, i) => (
+            <CurtainCard key={p.id} product={p} priority={i < 4} />
           ))}
         </div>
       </section>
 
-      {/* EMAIL CAPTURE */}
-      <section className="movement" id="subscribe">
-        <div className="movement__tag">Join the Movement</div>
-        <h2 className="movement__title">First Dibs on Drops</h2>
-        <p className="movement__desc">Exclusive access to new collections, limited drops, and insider-only pricing.</p>
-        <div className="movement__form">
-          <input type="email" className="movement__input" placeholder="Enter your email" />
-          <button className="movement__submit">Join</button>
+      {/* ═══════ 6. SECOND MARQUEE ═══════ */}
+      <section className="marquee-section" aria-hidden="true">
+        <div className="marquee-track" style={{ animationDirection: 'reverse' }}>
+          {[0,1].map(loop => (
+            <span key={loop}>
+              {['From Atlanta', 'For the World', 'Editorial Empire', 'Stush', 'Dressed for the Room'].map(w => (
+                <span className="marquee-item" key={loop + w}>{w}</span>
+              ))}
+            </span>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════ 7. SOCIETY (EMAIL SIGNUP) ═══════ */}
+      <section className="society" id="society">
+        <div className="society__inner">
+          <span className="eyebrow society__eyebrow">The Society</span>
+          <h2 className="society__head">
+            First dibs.<br />
+            <em>Always.</em>
+          </h2>
+          <p className="society__sub">
+            New drops, lookbook exclusives, and invitations to rooms
+            most people don&rsquo;t know exist.
+          </p>
+          <form
+            className="society__form"
+            action={`${SHOP_URL}/contact#contact_form`}
+            method="POST"
+          >
+            <input
+              type="email"
+              name="contact[email]"
+              className="society__input"
+              placeholder="Your email address"
+              required
+              autoComplete="email"
+            />
+            <button type="submit" className="society__submit">Join →</button>
+          </form>
+          <span className="society__legal">
+            No spam. Unsubscribe anytime. We respect the culture.
+          </span>
         </div>
       </section>
     </>

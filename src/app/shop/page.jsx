@@ -14,12 +14,12 @@ const CATEGORIES = [
 ];
 
 const COLLECTION_HANDLES = {
-  outerwear: 'outerwear',
-  blazers: 'blazers-suits',
-  tops: 'tops',
-  accessories: 'accessories',
-  denim: 'denim-trousers',
-  sets: 'sets-1',
+  outerwear: 'the-outerwear-vault',
+  blazers: 'the-blazer-room',
+  tops: 'the-tops-gallery',
+  accessories: 'the-accessories-lab',
+  denim: 'the-denim-archive',
+  sets: 'the-sets-edit',
 };
 
 export default async function ShopPage() {

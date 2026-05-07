@@ -5,12 +5,12 @@ export default function MobileMenu() {
   const [open, setOpen] = useState(false);
   const S = 'https://stushusa.myshopify.com';
   const links = [
-    { label: 'Shop All', href: '/shop' },
-    { label: 'Outerwear', href: `${S}/collections/outerwear` },
-    { label: 'Blazers', href: `${S}/collections/blazers-suits` },
-    { label: 'Tops', href: `${S}/collections/tops` },
-    { label: 'Accessories', href: `${S}/collections/accessories` },
-    { label: 'Cart', href: `${S}/cart` },
+    { label: 'Shop All',    href: '/shop' },
+    { label: 'Outerwear',   href: `${S}/collections/the-outerwear-vault` },
+    { label: 'Blazers',     href: `${S}/collections/the-blazer-room` },
+    { label: 'Tops',        href: `${S}/collections/the-tops-gallery` },
+    { label: 'Accessories', href: `${S}/collections/the-accessories-lab` },
+    { label: 'Cart',        href: `${S}/cart` },
   ];
   return (
     <>

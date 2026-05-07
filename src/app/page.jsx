@@ -41,7 +41,17 @@ export default async function HomePage() {
     <>
       {/* ═══════ 1. HERO ═══════ */}
       <section className="hero">
-        {heroImg && <img src={heroImg} alt="" className="hero__bg fadeIn" />}
+        {/* Video background — swap src to your STUSH brand video when ready */}
+        <video
+          className="hero__bg fadeIn"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          poster={heroImg || ''}
+          src="https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/dr_dorsey/02-evergreen-content/cinematic-luxury-nightlife.mp4"
+        />
         <div className="hero__overlay" />
         <div className="hero__inner">
           <div>

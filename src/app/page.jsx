@@ -50,7 +50,7 @@ export default async function HomePage() {
           playsInline
           preload="auto"
           poster={heroImg || ''}
-          src="https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/dr_dorsey/02-evergreen-content/cinematic-luxury-nightlife.mp4"
+          src="/STUSH_VID.mp4"
         />
         <div className="hero__overlay" />
         <div className="hero__inner">

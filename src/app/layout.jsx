@@ -87,13 +87,10 @@ export default function RootLayout({ children }) {
             </div>
             <div>
               <div className="footer__heading">Collections</div>
-              <a href="/collections/the-arrivals"        className="footer__link">The Arrivals</a>
-              <a href="/collections/the-outerwear-vault" className="footer__link">Outerwear Vault</a>
-              <a href="/collections/the-blazer-room"     className="footer__link">Blazer Room</a>
-              <a href="/collections/the-tops-gallery"    className="footer__link">Tops Gallery</a>
-              <a href="/collections/the-denim-archive"   className="footer__link">Denim Archive</a>
-              <a href="/collections/the-accessories-lab" className="footer__link">Accessories Lab</a>
-              <a href="/collections/the-sets-edit"       className="footer__link">Sets Edit</a>
+              <a href="/collections/stush"      className="footer__link">The Full Empire</a>
+              <a href="/shop"                    className="footer__link">Shop All</a>
+              <a href="/lookbook"                className="footer__link">Lookbook</a>
+              <a href="/journal"                 className="footer__link">Journal</a>
             </div>
             <div>
               <div className="footer__heading">Studio</div>

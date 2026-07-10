@@ -5,12 +5,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Shop All — STUSH' };
 
 const SECTIONS = [
-  { handle: 'the-outerwear-vault', label: 'Outerwear Vault' },
-  { handle: 'the-blazer-room',     label: 'Blazer Room' },
-  { handle: 'the-tops-gallery',    label: 'Tops Gallery' },
-  { handle: 'the-denim-archive',   label: 'Denim Archive' },
-  { handle: 'the-accessories-lab', label: 'Accessories Lab' },
-  { handle: 'the-sets-edit',       label: 'Sets Edit' },
+  { handle: 'stush', label: 'The Full Empire' },
 ];
 
 export default async function ShopPage() {

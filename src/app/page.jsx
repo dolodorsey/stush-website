@@ -2,10 +2,7 @@ import { getProducts, getCollections, getCollectionProducts, formatPrice, SHOP_U
 import CurtainCard from '@/components/CurtainCard';
 
 const COLLECTION_DISPLAY = [
-  { handle: 'the-outerwear-vault', display: 'Outerwear', accent: 'Vault' },
-  { handle: 'the-blazer-room',     display: 'Blazer',    accent: 'Room' },
-  { handle: 'the-tops-gallery',    display: 'Tops',      accent: 'Gallery' },
-  { handle: 'the-accessories-lab', display: 'Accessories',accent: 'Lab' },
+  { handle: 'stush', display: 'The', accent: 'Empire' },
 ];
 
 export default async function HomePage() {

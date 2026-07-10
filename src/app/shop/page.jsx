@@ -1,24 +1,39 @@
-import { getProducts, getCollections, getCollectionProducts } from '@/lib/shopify';
+import { getProducts } from '@/lib/shopify';
 import CurtainCard from '@/components/CurtainCard';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Shop All — STUSH' };
 
-const SECTIONS = [
-  { handle: 'stush', label: 'The Full Empire' },
+// Master category list — order shown on shop page + jump nav
+const CATEGORIES = [
+  { type: 'T-Shirt',    label: 'Tees',         id: 'tees' },
+  { type: 'Polo Shirt', label: 'Polos',        id: 'polos' },
+  { type: 'Jacket',     label: 'Jackets',      id: 'jackets' },
+  { type: 'Hoodie',     label: 'Hoodies',      id: 'hoodies' },
+  { type: 'Sweatshirt', label: 'Sweatshirts',  id: 'sweatshirts' },
+  { type: 'Sweatpants', label: 'Sweatpants',   id: 'sweatpants' },
+  { type: 'Pants',      label: 'Pants',        id: 'pants' },
+  { type: 'Shorts',     label: 'Shorts',       id: 'shorts' },
+  { type: 'Jersey',     label: 'Jerseys',      id: 'jerseys' },
+  { type: 'Tank Top',   label: 'Tanks',        id: 'tanks' },
+  { type: 'Crop Top',   label: 'Crop Tops',    id: 'crops' },
+  { type: 'Sports Bra', label: 'Sports Bras',  id: 'bras' },
+  { type: 'Leggings',   label: 'Leggings',     id: 'leggings' },
 ];
 
 export default async function ShopPage() {
-  const collections = await getCollections();
+  const products = await getProducts({ limit: 250 });
+  const byType = {};
+  products.forEach(p => {
+    const t = p.product_type || 'Other';
+    if (!byType[t]) byType[t] = [];
+    byType[t].push(p);
+  });
 
-  const sections = await Promise.all(
-    SECTIONS.map(async (sec) => {
-      const col = collections.find(c => c.handle === sec.handle);
-      if (!col) return { ...sec, products: [] };
-      const products = await getCollectionProducts(col.id, 12);
-      return { ...sec, products };
-    })
-  );
+  const sections = CATEGORIES.map(cat => ({
+    ...cat,
+    products: byType[cat.type] || [],
+  })).filter(s => s.products.length > 0);
 
   return (
     <>
@@ -31,43 +46,40 @@ export default async function ShopPage() {
         </h1>
       </header>
 
-      {/* Quick-jump nav */}
+      {/* Sticky category jump nav */}
       <nav style={{
         display: 'flex', gap: 24, flexWrap: 'wrap',
         padding: '20px var(--gutter)',
         borderBottom: '1px solid var(--bass-line)',
       }}>
-        {SECTIONS.map(sec => (
+        {sections.map(sec => (
           <a
-            key={sec.handle}
-            href={`#${sec.handle}`}
+            key={sec.id}
+            href={`#${sec.id}`}
             className="eyebrow"
             style={{ transition: 'color var(--t-quick)' }}
           >
-            {sec.label}
+            {sec.label} <span style={{ color: 'var(--muted)' }}>({sec.products.length})</span>
           </a>
         ))}
       </nav>
 
       {sections.map(sec => (
-        sec.products.length > 0 && (
-          <section key={sec.handle} id={sec.handle} className="product-section">
-            <div className="product-section__head">
-              <h2 className="collection-strip__title" style={{ fontSize: 'clamp(28px, 4vw, 52px)' }}>
-                {sec.label.split(' ').slice(0, -1).join(' ')}{' '}
-                <em>{sec.label.split(' ').pop()}</em>
-              </h2>
-              <a href={`/collections/${sec.handle}`} className="eyebrow eyebrow--gold" style={{ paddingBottom: 6 }}>
-                View All →
-              </a>
-            </div>
-            <div className="product-grid">
-              {sec.products.map((p, i) => (
-                <CurtainCard key={p.id} product={p} priority={i < 4} />
-              ))}
-            </div>
-          </section>
-        )
+        <section key={sec.id} id={sec.id} className="product-section">
+          <div className="product-section__head">
+            <h2 className="collection-strip__title" style={{ fontSize: 'clamp(28px, 4vw, 52px)' }}>
+              The <em>{sec.label}</em>
+            </h2>
+            <span className="eyebrow eyebrow--gold" style={{ paddingBottom: 6 }}>
+              {sec.products.length} pieces
+            </span>
+          </div>
+          <div className="product-grid">
+            {sec.products.map((p, i) => (
+              <CurtainCard key={p.id} product={p} priority={i < 4} />
+            ))}
+          </div>
+        </section>
       ))}
     </>
   );

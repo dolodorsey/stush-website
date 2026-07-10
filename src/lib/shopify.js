@@ -1,7 +1,7 @@
-// server-only Shopify wrapper for stushusa.myshopify.com
+// server-only Shopify wrapper for master multi-brand store (thehautehalloween.myshopify.com)
 // Uses Admin REST API; never exposes the token to the client.
 
-const STORE = 'stushusa.myshopify.com';
+const STORE = 'thehautehalloween.myshopify.com';
 const TOKEN = process.env.SHOPIFY_ADMIN_TOKEN;
 const API   = `https://${STORE}/admin/api/2024-10`;
 
@@ -38,7 +38,8 @@ export async function getProducts(opts = {}) {
   const params = new URLSearchParams({ status, limit: String(limit) });
   if (fields) params.set('fields', fields);
   const data = await shopifyFetch(`/products.json?${params}`);
-  return data?.products ?? [];
+  const all = data?.products ?? [];
+  return all.filter(p => (p.tags || '').split(',').map(t => t.trim()).includes('brand_stush'));
 }
 
 export async function getProductByHandle(handle) {
@@ -67,7 +68,8 @@ export async function getCollectionProducts(collectionId, limit = 60) {
   const data = await shopifyFetch(
     `/products.json?collection_id=${collectionId}&limit=${limit}&status=active`
   );
-  return data?.products ?? [];
+  const all = data?.products ?? [];
+  return all.filter(p => (p.tags || '').split(',').map(t => t.trim()).includes('brand_stush'));
 }
 
 // -------- helpers --------

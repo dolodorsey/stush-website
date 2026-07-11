@@ -13,7 +13,7 @@ export const metadata = {
   },
 };
 
-const SHOPIFY = 'https://thehautehalloween.myshopify.com';
+const SHOPIFY = 'https://www.bodegabodegabodega.com';
 
 const NAV = [
   { label: 'Shop',         href: '/shop' },

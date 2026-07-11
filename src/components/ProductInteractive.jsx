@@ -5,7 +5,7 @@ import { useState, useMemo } from 'react';
 // Client-side interactive product page: variant selection + image gallery + cart URL
 // Props:
 //   product   — full Shopify Admin product JSON
-//   store     — 'https://thehautehalloween.myshopify.com' (already includes protocol)
+//   store     — 'https://www.bodegabodegabodega.com' (already includes protocol)
 //   description — plain-text description (pre-computed on server)
 
 export default function ProductInteractive({ product, store, description }) {

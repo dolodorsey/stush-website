@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-const S = 'https://thehautehalloween.myshopify.com';
+const S = 'https://www.bodegabodegabodega.com';
 const LINKS = [
   { label: 'Shop',        href: '/shop' },
   { label: 'Collections', href: '/collections' },

@@ -1,7 +1,7 @@
-// server-only Shopify wrapper for master multi-brand store (thehautehalloween.myshopify.com)
+// server-only Shopify wrapper for master multi-brand store (www.bodegabodegabodega.com)
 // Uses Admin REST API; never exposes the token to the client.
 
-const STORE = 'thehautehalloween.myshopify.com';
+const STORE = 'www.bodegabodegabodega.com';
 const TOKEN = process.env.SHOPIFY_ADMIN_TOKEN;
 const API   = `https://${STORE}/admin/api/2024-10`;
 

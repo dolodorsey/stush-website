@@ -153,6 +153,30 @@ export default async function HomePage() {
       </section>
 
       {/* ═══════ 5. PRODUCT GRID (CURTAIN CARDS) ═══════ */}
+      {/* ═══════ ATELIER (gold boutique) ═══════ */}
+      <section style={{
+        position: 'relative',
+        margin: '80px 0',
+        padding: 'clamp(60px,10vw,120px) var(--gutter)',
+        background: 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.85) 100%), url(/brand/STUSH_ATELIER.png) center/cover no-repeat',
+        color: 'var(--cream)',
+      }}>
+        <div style={{maxWidth: 780, margin: '0 auto', textAlign: 'center'}}>
+          <span className="eyebrow" style={{color: 'var(--gold)', letterSpacing: '0.24em'}}>THE ATELIER</span>
+          <h2 className="story__head" style={{marginTop: 20, marginBottom: 24, fontSize: 'clamp(36px, 5vw, 68px)'}}>
+            Made in the <em>Room</em>.
+          </h2>
+          <p className="story__body" style={{maxWidth: 620, margin: '0 auto', fontSize: 'clamp(15px, 1.2vw, 18px)', lineHeight: 1.75}}>
+            Every piece cut, sewn, and finished by hand. Runway-grade construction.
+            Limited runs. The Empire opens its doors to the ones who belong inside.
+          </p>
+          <div style={{marginTop: 40, display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap'}}>
+            <a href="/lookbook" className="btn btn--cream">See the Lookbook →</a>
+            <a href="/shop" className="btn btn--gold-outline">Shop the Empire</a>
+          </div>
+        </div>
+      </section>
+
       <section className="product-section">
         <div className="product-section__head">
           <h2 className="collection-strip__title">

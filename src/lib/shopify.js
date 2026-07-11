@@ -1,7 +1,8 @@
-// server-only Shopify wrapper for master multi-brand store (www.bodegabodegabodega.com)
+// server-only Shopify wrapper for master store — Admin API via .myshopify, cart via custom domain
 // Uses Admin REST API; never exposes the token to the client.
 
-const STORE = 'www.bodegabodegabodega.com';
+const STORE = 'thehautehalloween.myshopify.com'; // Admin API host — Shopify requires .myshopify.com for auth
+export const CART_ORIGIN = 'https://www.bodegabodegabodega.com'; // Where cart/checkout URLs point
 const TOKEN = process.env.SHOPIFY_ADMIN_TOKEN;
 const API   = `https://${STORE}/admin/api/2024-10`;
 

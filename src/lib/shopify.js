@@ -1,79 +1,74 @@
-// server-only Shopify wrapper for master store — Admin API via .myshopify, cart via custom domain
-// Uses Admin REST API; never exposes the token to the client.
+// server-only Shopify wrapper — uses PUBLIC Shopify JSON endpoints, no token needed.
+// Shopify exposes /products.json and /collections/{handle}/products.json on every store.
+// This lets us fetch products without any Admin API token or Storefront token.
 
-const STORE = process.env.SHOPIFY_STORE_DOMAIN || 'bodgeaworldwide.myshopify.com'; // Bodega master store — Admin API host
-export const CART_ORIGIN = 'https://www.bodegabodegabodega.com'; // Where cart/checkout URLs point (Shopify custom domain)
-const TOKEN = process.env.SHOPIFY_ADMIN_TOKEN;
-const API   = `https://${STORE}/admin/api/2025-01`;
+const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'www.bodegabodegabodega.com';
+export const CART_ORIGIN = `https://${STORE_DOMAIN.replace(/^https?:\/\//, '')}`;
 
-const HEADERS = TOKEN
-  ? { 'X-Shopify-Access-Token': TOKEN, 'Accept': 'application/json' }
-  : null;
+const UA = 'Mozilla/5.0 (compatible; StushWeb/1.0)';
+const BRAND_TAG = 'brand:stush';
 
-async function shopifyFetch(endpoint, init = {}) {
-  if (!HEADERS) {
-    console.error('SHOPIFY_ADMIN_TOKEN not set');
-    return null;
-  }
+async function publicFetch(path) {
+  const url = `${CART_ORIGIN}${path}`;
   try {
-    const res = await fetch(`${API}${endpoint}`, {
-      headers: HEADERS,
-      cache: 'no-store',
-      ...init,
+    const res = await fetch(url, {
+      headers: { 'User-Agent': UA, 'Accept': 'application/json' },
+      next: { revalidate: 60 },
     });
     if (!res.ok) {
-      console.error(`Shopify ${res.status}: ${endpoint}`);
+      console.error(`Shopify ${res.status}: ${path}`);
       return null;
     }
     return res.json();
   } catch (err) {
-    console.error(`Shopify fetch error (${endpoint}): ${err.message}`);
+    console.error(`Shopify fetch error (${path}): ${err.message}`);
     return null;
   }
 }
 
-// Brand filter — new tagging format uses colon separator
-const BRAND_TAG = 'brand:stush';
-
 // -------- products --------
 
+// Fetches STUSH brand collection directly — auto-populates from tag rule brand:stush
 export async function getProducts(opts = {}) {
-  const { status = 'active', limit = 250, fields } = opts;
-  const params = new URLSearchParams({ status, limit: String(limit) });
-  if (fields) params.set('fields', fields);
-  const data = await shopifyFetch(`/products.json?${params}`);
-  const all = data?.products ?? [];
-  return all.filter(p => (p.tags || '').split(',').map(t => t.trim()).includes(BRAND_TAG));
+  const { limit = 60 } = opts;
+  const data = await publicFetch(`/collections/stush/products.json?limit=${limit}`);
+  return data?.products ?? [];
 }
 
 export async function getProductByHandle(handle) {
   if (!handle) return null;
-  // Shopify Admin doesn't have a direct "by handle" endpoint without pagination.
-  // We fetch first 250 active products and lookup by handle.
-  // For 250+ catalogs we'd switch to GraphQL Admin or Storefront API.
-  const products = await getProducts({ limit: 250, status: 'active' });
-  return products.find(p => p.handle === handle) ?? null;
+  const data = await publicFetch(`/products/${handle}.json`);
+  return data?.product ?? null;
 }
 
 // -------- collections --------
 
 export async function getCollections() {
-  const data = await shopifyFetch('/smart_collections.json?limit=50');
-  return data?.smart_collections ?? [];
+  const data = await publicFetch('/collections.json?limit=50');
+  const all = data?.collections ?? [];
+  // Filter to STUSH-relevant collections (brand + type subcategories)
+  return all.filter(c => {
+    const h = c.handle || '';
+    return h === 'stush' || h === 'new-arrivals' || h === 'the-book';
+  });
 }
 
 export async function getCollectionByHandle(handle) {
-  const colls = await getCollections();
-  return colls.find(c => c.handle === handle) ?? null;
+  if (!handle) return null;
+  const data = await publicFetch(`/collections/${handle}.json`);
+  return data?.collection ?? null;
 }
 
-export async function getCollectionProducts(collectionId, limit = 60) {
-  if (!collectionId) return [];
-  const data = await shopifyFetch(
-    `/products.json?collection_id=${collectionId}&limit=${limit}&status=active`
-  );
+export async function getCollectionProducts(handle, limit = 60) {
+  if (!handle) return [];
+  const data = await publicFetch(`/collections/${handle}/products.json?limit=${limit}`);
   const all = data?.products ?? [];
-  return all.filter(p => (p.tags || '').split(',').map(t => t.trim()).includes(BRAND_TAG));
+  // For non-stush collections, still filter to STUSH products only
+  if (handle === 'stush') return all;
+  return all.filter(p => {
+    const tags = Array.isArray(p.tags) ? p.tags : (p.tags || '').split(',').map(t => t.trim());
+    return tags.includes(BRAND_TAG);
+  });
 }
 
 // -------- helpers --------
@@ -84,25 +79,23 @@ export function formatPrice(price) {
   return '$' + num.toFixed(0);
 }
 
-// Pick a "second" image for the curtain reveal — prefer one that's clearly different from the cover
 export function pickHoverImage(product) {
   const imgs = product?.images ?? [];
   if (imgs.length === 0) return null;
   if (imgs.length === 1) return imgs[0]?.src ?? null;
-  // Prefer an image at index 1 (typically "alt angle"), fall back to the last
   return imgs[1]?.src ?? imgs[imgs.length - 1]?.src ?? null;
 }
 
-// Stable Shopify URL for CART/CHECKOUT — always custom domain, never .myshopify
+// Stable Shopify URL for cart/product
 export const SHOP_URL = CART_ORIGIN;
 
-// Build cart-add deeplink — points to the CART_ORIGIN (custom domain)
+// Build cart-add deeplink — points to the store's custom domain
 export function cartAddUrl(variantId, quantity = 1) {
   if (!variantId) return `${CART_ORIGIN}/cart`;
   return `${CART_ORIGIN}/cart/${variantId}:${quantity}`;
 }
 
-// Convert raw HTML body to a safe, readable string for product descriptions
+// Convert raw HTML body to a safe, readable string
 export function plainDescription(html, max = 280) {
   if (!html) return '';
   const stripped = String(html).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();

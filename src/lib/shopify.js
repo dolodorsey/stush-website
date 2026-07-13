@@ -1,10 +1,10 @@
 // server-only Shopify wrapper for master store — Admin API via .myshopify, cart via custom domain
 // Uses Admin REST API; never exposes the token to the client.
 
-const STORE = 'thehautehalloween.myshopify.com'; // Admin API host — Shopify requires .myshopify.com for auth
-export const CART_ORIGIN = 'https://www.bodegabodegabodega.com'; // Where cart/checkout URLs point
+const STORE = process.env.SHOPIFY_STORE_DOMAIN || 'bodgeaworldwide.myshopify.com'; // Bodega master store — Admin API host
+export const CART_ORIGIN = 'https://www.bodegabodegabodega.com'; // Where cart/checkout URLs point (Shopify custom domain)
 const TOKEN = process.env.SHOPIFY_ADMIN_TOKEN;
-const API   = `https://${STORE}/admin/api/2024-10`;
+const API   = `https://${STORE}/admin/api/2025-01`;
 
 const HEADERS = TOKEN
   ? { 'X-Shopify-Access-Token': TOKEN, 'Accept': 'application/json' }
@@ -32,6 +32,9 @@ async function shopifyFetch(endpoint, init = {}) {
   }
 }
 
+// Brand filter — new tagging format uses colon separator
+const BRAND_TAG = 'brand:stush';
+
 // -------- products --------
 
 export async function getProducts(opts = {}) {
@@ -40,7 +43,7 @@ export async function getProducts(opts = {}) {
   if (fields) params.set('fields', fields);
   const data = await shopifyFetch(`/products.json?${params}`);
   const all = data?.products ?? [];
-  return all.filter(p => (p.tags || '').split(',').map(t => t.trim()).includes('brand_stush'));
+  return all.filter(p => (p.tags || '').split(',').map(t => t.trim()).includes(BRAND_TAG));
 }
 
 export async function getProductByHandle(handle) {
@@ -70,7 +73,7 @@ export async function getCollectionProducts(collectionId, limit = 60) {
     `/products.json?collection_id=${collectionId}&limit=${limit}&status=active`
   );
   const all = data?.products ?? [];
-  return all.filter(p => (p.tags || '').split(',').map(t => t.trim()).includes('brand_stush'));
+  return all.filter(p => (p.tags || '').split(',').map(t => t.trim()).includes(BRAND_TAG));
 }
 
 // -------- helpers --------
@@ -90,13 +93,13 @@ export function pickHoverImage(product) {
   return imgs[1]?.src ?? imgs[imgs.length - 1]?.src ?? null;
 }
 
-// Stable Shopify URL for cart/product
-export const SHOP_URL = `https://${STORE}`;
+// Stable Shopify URL for CART/CHECKOUT — always custom domain, never .myshopify
+export const SHOP_URL = CART_ORIGIN;
 
-// Build cart-add deeplink
+// Build cart-add deeplink — points to the CART_ORIGIN (custom domain)
 export function cartAddUrl(variantId, quantity = 1) {
-  if (!variantId) return `${SHOP_URL}/cart`;
-  return `${SHOP_URL}/cart/${variantId}:${quantity}`;
+  if (!variantId) return `${CART_ORIGIN}/cart`;
+  return `${CART_ORIGIN}/cart/${variantId}:${quantity}`;
 }
 
 // Convert raw HTML body to a safe, readable string for product descriptions

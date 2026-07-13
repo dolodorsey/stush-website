@@ -2,18 +2,22 @@
 // Shopify exposes /products.json and /collections/{handle}/products.json on every store.
 // This lets us fetch products without any Admin API token or Storefront token.
 
-const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'www.bodegabodegabodega.com';
-export const CART_ORIGIN = `https://${STORE_DOMAIN.replace(/^https?:\/\//, '')}`;
+// Product JSON is fetched from the canonical .myshopify.com host (public JSON endpoints
+// work reliably there). Cart/checkout links point at the branded custom domain.
+const FETCH_HOST = process.env.SHOPIFY_STORE_DOMAIN || 'bodgeaworldwide.myshopify.com';
+const CHECKOUT_HOST = 'www.bodegabodegabodega.com';
+const FETCH_ORIGIN = `https://${FETCH_HOST.replace(/^https?:\/\//, '')}`;
+export const CART_ORIGIN = `https://${CHECKOUT_HOST}`;
 
 const UA = 'Mozilla/5.0 (compatible; StushWeb/1.0)';
 const BRAND_TAG = 'brand:stush';
 
 async function publicFetch(path) {
-  const url = `${CART_ORIGIN}${path}`;
+  const url = `${FETCH_ORIGIN}${path}`;
   try {
     const res = await fetch(url, {
       headers: { 'User-Agent': UA, 'Accept': 'application/json' },
-      next: { revalidate: 60 },
+      cache: 'no-store',
     });
     if (!res.ok) {
       console.error(`Shopify ${res.status}: ${path}`);

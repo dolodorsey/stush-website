@@ -59,8 +59,17 @@ export async function getCollectionByHandle(handle) {
   return data?.collection ?? null;
 }
 
-export async function getCollectionProducts(handle, limit = 60) {
-  if (!handle) return [];
+export async function getCollectionProducts(handleOrId, limit = 60) {
+  if (!handleOrId) return [];
+  // Public endpoint uses handle. If a numeric ID was passed (from collections.json response),
+  // look up its handle from the full collections list.
+  let handle = handleOrId;
+  if (/^\d+$/.test(String(handleOrId))) {
+    const colls = await getCollections();
+    const match = colls.find(c => String(c.id) === String(handleOrId));
+    if (!match?.handle) return [];
+    handle = match.handle;
+  }
   const data = await publicFetch(`/collections/${handle}/products.json?limit=${limit}`);
   const all = data?.products ?? [];
   // For non-stush collections, still filter to STUSH products only

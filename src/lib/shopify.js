@@ -35,7 +35,7 @@ async function publicFetch(path) {
 // Fetches STUSH brand collection directly — auto-populates from tag rule brand:stush
 export async function getProducts(opts = {}) {
   const { limit = 60 } = opts;
-  const data = await publicFetch(`/collections/stush/products.json?limit=${limit}`);
+  const data = await publicFetch(`/collections/stush-usa/products.json?limit=${limit}`);
   return data?.products ?? [];
 }
 
@@ -53,7 +53,7 @@ export async function getCollections() {
   // Filter to STUSH-relevant collections (brand + type subcategories)
   return all.filter(c => {
     const h = c.handle || '';
-    return h === 'stush' || h === 'new-arrivals' || h === 'the-book';
+    return h === 'stush-usa';
   });
 }
 
@@ -76,12 +76,7 @@ export async function getCollectionProducts(handleOrId, limit = 60) {
   }
   const data = await publicFetch(`/collections/${handle}/products.json?limit=${limit}`);
   const all = data?.products ?? [];
-  // For non-stush collections, still filter to STUSH products only
-  if (handle === 'stush') return all;
-  return all.filter(p => {
-    const tags = Array.isArray(p.tags) ? p.tags : (p.tags || '').split(',').map(t => t.trim());
-    return tags.includes(BRAND_TAG);
-  });
+  return all;
 }
 
 // -------- helpers --------

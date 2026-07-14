@@ -7,6 +7,8 @@ export const metadata = { title: 'Shop All — STUSH' };
 // Master category list — order shown on shop page + jump nav
 const CATEGORIES = [
   { type: 'T-Shirt',    label: 'Tees',         id: 'tees' },
+  { type: 'Cap',        label: 'Caps',         id: 'caps' },
+  { type: 'Bottoms',    label: 'Bottoms',      id: 'bottoms' },
   { type: 'Polo Shirt', label: 'Polos',        id: 'polos' },
   { type: 'Jacket',     label: 'Jackets',      id: 'jackets' },
   { type: 'Hoodie',     label: 'Hoodies',      id: 'hoodies' },

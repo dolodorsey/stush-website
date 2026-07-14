@@ -3,6 +3,7 @@ import CurtainCard from '@/components/CurtainCard';
 import { groupProductsByType } from '@/lib/productCategories';
 
 const EDITORIAL_FRAMES = [
+  { src: '/campaigns/stush-real-product.png', label: 'The Real Product Edit' },
   { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_brooklyn_stoop/045_stush___fafo_brooklyn_stoop.jpg', label: 'Elevated Essentials' },
   { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_paris_cafe/052_stush___paris_cafe.jpg', label: 'Paris Café' },
   { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_pinstripe_power/067_pinstripe_power___classic_stripes__bold_.jpg', label: 'Pinstripe Power' },
@@ -10,7 +11,6 @@ const EDITORIAL_FRAMES = [
   { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_real_streetwear/058_stush___sunset_rooftop_group.jpg', label: 'Real Streetwear' },
   { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_utility_luxe/068_stush___utility_luxe.jpg', label: 'Utility Luxe' },
   { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_new_drop/062_stush___new_drop_product_collage.jpg', label: 'The New Drop' },
-  { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_polo_collection/054_stush___grey_polo_luxury.jpg', label: 'The Polo Collection' },
 ];
 
 export default async function HomePage() {

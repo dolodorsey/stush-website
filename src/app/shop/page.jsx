@@ -32,10 +32,20 @@ export default async function ShopPage() {
     byType[t].push(p);
   });
 
+  const categorizedTypes = new Set(CATEGORIES.map(cat => cat.type));
   const sections = CATEGORIES.map(cat => ({
     ...cat,
     products: byType[cat.type] || [],
-  })).filter(s => s.products.length > 0);
+  })).filter(s => s.products.length > 0).concat(
+    Object.entries(byType)
+      .filter(([type]) => !categorizedTypes.has(type))
+      .map(([type, typeProducts]) => ({
+        type,
+        label: type,
+        id: `other-${type.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+        products: typeProducts,
+      })),
+  );
 
   return (
     <>

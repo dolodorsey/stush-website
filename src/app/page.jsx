@@ -2,7 +2,22 @@ import { getProducts, getCollections, getCollectionProducts, formatPrice, SHOP_U
 import CurtainCard from '@/components/CurtainCard';
 
 const COLLECTION_DISPLAY = [
-  { handle: 'stush', display: 'The', accent: 'Empire' },
+  { handle: 'stush-usa', display: 'The', accent: 'Empire' },
+];
+
+const EDITORIAL_FRAMES = [
+  '/brand/RED.png',
+  '/brand/ST.png',
+  '/brand/STUSH.png',
+  '/brand/STUSH0.png',
+  '/brand/STUSH2.png',
+  '/brand/STUSH3.png',
+  '/brand/STUSH4.png',
+  '/brand/STUSH_COLLEGE.png',
+  '/brand/STUSH_OLYPICS.png',
+  '/brand/STUSSS_.png',
+  '/brand/StushW.png',
+  '/brand/stushsss.png',
 ];
 
 export default async function HomePage() {
@@ -123,6 +138,28 @@ export default async function HomePage() {
             </a>
           ))}
         </div>
+      </section>
+
+      {/* ═══════ THE COMPLETE VISUAL ARCHIVE ═══════ */}
+      <section className="editorial-archive" aria-label="STUSH visual archive">
+        <header className="editorial-archive__intro">
+          <span className="eyebrow eyebrow--pink">The complete archive</span>
+          <h2 className="editorial-archive__title">Every mark.<br /><em>Full frame.</em></h2>
+        </header>
+        {EDITORIAL_FRAMES.map((src, index) => (
+          <figure className="editorial-frame" key={src}>
+            <div className="editorial-frame__wash" style={{ backgroundImage: `url(${src})` }} />
+            <img
+              src={src}
+              alt={`STUSH visual archive frame ${String(index + 1).padStart(2, '0')}`}
+              className="editorial-frame__image"
+              loading={index < 2 ? 'eager' : 'lazy'}
+            />
+            <figcaption className="editorial-frame__caption">
+              STUSH / {String(index + 1).padStart(2, '0')}
+            </figcaption>
+          </figure>
+        ))}
       </section>
 
       {/* ═══════ 4. STORY ═══════ */}

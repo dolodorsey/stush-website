@@ -1,11 +1,11 @@
 import './globals.css';
-import { Cormorant_Garamond, DM_Mono, DM_Sans } from 'next/font/google';
+import { Bodoni_Moda, DM_Mono, DM_Sans } from 'next/font/google';
 import MobileMenu from '@/components/MobileMenu';
 import NavScroll from '@/components/NavScroll';
 
-const serif = Cormorant_Garamond({
+const serif = Bodoni_Moda({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
+  weight: ['400', '500', '600', '700'],
   style: ['normal', 'italic'],
   variable: '--font-stush-serif',
   display: 'swap',

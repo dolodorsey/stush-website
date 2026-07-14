@@ -31,6 +31,7 @@ export const metadata = {
     description: 'Editorial Empire from Atlanta.',
     type: 'website',
     url: 'https://stushusa.com',
+    images: ['https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_brooklyn_stoop/045_stush___fafo_brooklyn_stoop.jpg'],
   },
 };
 

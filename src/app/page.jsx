@@ -1,30 +1,20 @@
-import { getProducts, getCollections, getCollectionProducts, formatPrice, SHOP_URL } from '@/lib/shopify';
+import { getProducts, SHOP_URL } from '@/lib/shopify';
 import CurtainCard from '@/components/CurtainCard';
-
-const COLLECTION_DISPLAY = [
-  { handle: 'stush-usa', display: 'The', accent: 'Empire' },
-];
+import { groupProductsByType } from '@/lib/productCategories';
 
 const EDITORIAL_FRAMES = [
-  '/brand/RED.png',
-  '/brand/ST.png',
-  '/brand/STUSH.png',
-  '/brand/STUSH0.png',
-  '/brand/STUSH2.png',
-  '/brand/STUSH3.png',
-  '/brand/STUSH4.png',
-  '/brand/STUSH_COLLEGE.png',
-  '/brand/STUSH_OLYPICS.png',
-  '/brand/STUSSS_.png',
-  '/brand/StushW.png',
-  '/brand/stushsss.png',
+  { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_brooklyn_stoop/045_stush___fafo_brooklyn_stoop.jpg', label: 'Elevated Essentials' },
+  { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_paris_cafe/052_stush___paris_cafe.jpg', label: 'Paris Café' },
+  { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_pinstripe_power/067_pinstripe_power___classic_stripes__bold_.jpg', label: 'Pinstripe Power' },
+  { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_sport_luxe/064_stush___sport_luxe.jpg', label: 'Sport Luxe' },
+  { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_real_streetwear/058_stush___sunset_rooftop_group.jpg', label: 'Real Streetwear' },
+  { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_utility_luxe/068_stush___utility_luxe.jpg', label: 'Utility Luxe' },
+  { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_new_drop/062_stush___new_drop_product_collage.jpg', label: 'The New Drop' },
+  { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_polo_collection/054_stush___grey_polo_luxury.jpg', label: 'The Polo Collection' },
 ];
 
 export default async function HomePage() {
-  const [allProducts, allCollections] = await Promise.all([
-    getProducts({ limit: 250 }),
-    getCollections(),
-  ]);
+  const allProducts = await getProducts({ limit: 250 });
 
   // Hero product — highest-priced with an image
   const sorted = [...allProducts]
@@ -33,21 +23,7 @@ export default async function HomePage() {
   const hero = sorted[0];
   const heroImg = hero?.images?.[0]?.src;
 
-  // Collection strip — get product counts + first image per collection
-  const stripData = await Promise.all(
-    COLLECTION_DISPLAY.map(async (cd) => {
-      const col = allCollections.find(c => c.handle === cd.handle);
-      if (!col) return { ...cd, count: 0, img: null, id: null };
-      const products = await getCollectionProducts(col.id, 4);
-      const img = products?.[0]?.images?.[0]?.src || col.image?.src || null;
-      return { ...cd, count: products.length, img, id: col.id };
-    })
-  );
-
-  // Featured products — best sellers by position, first 8 with 2+ images (for curtain effect)
-  const featured = allProducts
-    .filter(p => (p.images?.length || 0) >= 2)
-    .slice(0, 12);
+  const productSections = groupProductsByType(allProducts);
 
   return (
     <>
@@ -101,65 +77,47 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ═══════ 3. COLLECTION STRIP ═══════ */}
-      <section className="collection-strip">
+      {/* ═══════ 3. SHOP BY TYPE ═══════ */}
+      <section className="category-index">
         <div className="collection-strip__head">
           <h2 className="collection-strip__title">
-            The <em>Collections</em>
+            Shop by <em>Type</em>
           </h2>
-          <a href="/collections" className="eyebrow eyebrow--gold" style={{ paddingBottom: 6 }}>
-            View All →
+          <a href="/shop" className="eyebrow eyebrow--gold" style={{ paddingBottom: 6 }}>
+            Shop All →
           </a>
         </div>
-        <div className="collection-strip__grid">
-          {stripData.map(cd => (
-            <a
-              key={cd.handle}
-              href={`/collections/${cd.handle}`}
-              className="collection-card"
-            >
-              {cd.img && (
-                <img
-                  src={cd.img}
-                  alt={cd.display}
-                  className="collection-card__img"
-                  loading="lazy"
-                />
-              )}
-              <div className="collection-card__veil" />
-              <div className="collection-card__copy">
-                <div className="collection-card__name">
-                  {cd.display} <em>{cd.accent}</em>
-                </div>
-                <div className="collection-card__count">
-                  {cd.count}+ pieces
-                </div>
-              </div>
+        <div className="category-index__links">
+          {productSections.map(section => (
+            <a key={section.id} href={`/shop#${section.id}`} className="category-index__link">
+              <span>{section.label}</span>
+              <small>{section.products.length}</small>
             </a>
           ))}
         </div>
       </section>
 
-      {/* ═══════ THE COMPLETE VISUAL ARCHIVE ═══════ */}
+      {/* ═══════ SUPABASE EDITORIAL CAMPAIGNS ═══════ */}
       <section className="editorial-archive" aria-label="STUSH visual archive">
         <header className="editorial-archive__intro">
-          <span className="eyebrow eyebrow--pink">The complete archive</span>
-          <h2 className="editorial-archive__title">Every mark.<br /><em>Full frame.</em></h2>
+          <span className="eyebrow eyebrow--pink">The campaign</span>
+          <h2 className="editorial-archive__title">The STUSH<br /><em>edit.</em></h2>
         </header>
-        {EDITORIAL_FRAMES.map((src, index) => (
-          <figure className="editorial-frame" key={src}>
-            <div className="editorial-frame__wash" style={{ backgroundImage: `url(${src})` }} />
+        <div className="editorial-archive__grid">
+        {EDITORIAL_FRAMES.map((frame, index) => (
+          <figure className="editorial-frame" key={frame.src}>
             <img
-              src={src}
-              alt={`STUSH visual archive frame ${String(index + 1).padStart(2, '0')}`}
+              src={frame.src}
+              alt={`STUSH ${frame.label} campaign`}
               className="editorial-frame__image"
-              loading={index < 2 ? 'eager' : 'lazy'}
+              loading="lazy"
             />
             <figcaption className="editorial-frame__caption">
-              STUSH / {String(index + 1).padStart(2, '0')}
+              <span>{frame.label}</span><span>{String(index + 1).padStart(2, '0')}</span>
             </figcaption>
           </figure>
         ))}
+        </div>
       </section>
 
       {/* ═══════ 4. STORY ═══════ */}
@@ -216,21 +174,21 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="product-section">
-        <div className="product-section__head">
-          <h2 className="collection-strip__title">
-            Featured <em>Pieces</em>
-          </h2>
-          <a href="/shop" className="eyebrow eyebrow--gold" style={{ paddingBottom: 6 }}>
-            Shop All →
-          </a>
-        </div>
-        <div className="product-grid">
-          {featured.map((p, i) => (
-            <CurtainCard key={p.id} product={p} priority={i < 4} />
-          ))}
-        </div>
-      </section>
+      {productSections.slice(0, 5).map((section, sectionIndex) => (
+        <section className="product-section" key={section.id}>
+          <div className="product-section__head">
+            <h2 className="collection-strip__title">{section.label}</h2>
+            <a href={`/shop#${section.id}`} className="eyebrow eyebrow--gold" style={{ paddingBottom: 6 }}>
+              View {section.products.length} →
+            </a>
+          </div>
+          <div className="product-grid">
+            {section.products.slice(0, 6).map((product, index) => (
+              <CurtainCard key={product.id} product={product} priority={sectionIndex === 0 && index < 6} />
+            ))}
+          </div>
+        </section>
+      ))}
 
       {/* ═══════ 6. SECOND MARQUEE ═══════ */}
       <section className="marquee-section" aria-hidden="true">

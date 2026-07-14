@@ -5,7 +5,7 @@
 // Product JSON is fetched from the canonical .myshopify.com host (public JSON endpoints
 // work reliably there). Cart/checkout links point at the branded custom domain.
 const FETCH_HOST = process.env.SHOPIFY_STORE_DOMAIN || 'bodgeaworldwide.myshopify.com';
-const CHECKOUT_HOST = 'www.bodegabodegabodega.com';
+const CHECKOUT_HOST = 'bodgeaworldwide.myshopify.com';
 const FETCH_ORIGIN = `https://${FETCH_HOST.replace(/^https?:\/\//, '')}`;
 export const CART_ORIGIN = `https://${CHECKOUT_HOST}`;
 

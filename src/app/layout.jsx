@@ -13,7 +13,7 @@ export const metadata = {
   },
 };
 
-const SHOPIFY = 'https://www.bodegabodegabodega.com';
+const SHOPIFY = 'https://bodgeaworldwide.myshopify.com';
 
 const NAV = [
   { label: 'Shop',         href: '/shop' },

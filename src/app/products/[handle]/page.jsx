@@ -4,7 +4,7 @@ import ProductInteractive from '@/components/ProductInteractive';
 
 export const dynamic = 'force-dynamic';
 
-const STORE_URL = "https://www.bodegabodegabodega.com";
+const STORE_URL = "https://bodgeaworldwide.myshopify.com";
 
 export async function generateMetadata({ params }) {
   const product = await getProductByHandle(params.handle);

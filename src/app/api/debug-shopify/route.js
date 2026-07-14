@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET() {
-  const url = 'https://www.bodegabodegabodega.com/collections/stush/products.json?limit=5';
+  const url = 'https://bodgeaworldwide.myshopify.com/collections/stush/products.json?limit=5';
   const attempts = [];
 
   // Attempt 1: minimal UA

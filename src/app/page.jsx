@@ -156,7 +156,9 @@ export default async function HomePage() {
       {/* ═══════ ATELIER (gold boutique) ═══════ */}
       <section style={{
         position: 'relative',
-        margin: '80px 0',
+        minHeight: '100svh',
+        display: 'flex',
+        alignItems: 'center',
         padding: 'clamp(60px,10vw,120px) var(--gutter)',
         background: 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.85) 100%), url(/brand/STUSH_ATELIER.png) center/cover no-repeat',
         color: 'var(--cream)',

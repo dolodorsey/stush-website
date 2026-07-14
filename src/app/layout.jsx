@@ -1,6 +1,27 @@
 import './globals.css';
+import { Cormorant_Garamond, DM_Mono, DM_Sans } from 'next/font/google';
 import MobileMenu from '@/components/MobileMenu';
 import NavScroll from '@/components/NavScroll';
+
+const serif = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  style: ['normal', 'italic'],
+  variable: '--font-stush-serif',
+  display: 'swap',
+});
+const sans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '700'],
+  variable: '--font-stush-sans',
+  display: 'swap',
+});
+const mono = DM_Mono({
+  subsets: ['latin'],
+  weight: ['300', '400', '500'],
+  variable: '--font-stush-mono',
+  display: 'swap',
+});
 
 export const metadata = {
   title: 'STUSH — Editorial Empire from Atlanta',
@@ -32,7 +53,7 @@ const ANNOUNCE_LINES = [
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
       <body>
         {/* Top marquee — wakes the page up */}
         <aside className="announce" aria-label="Site announcements">

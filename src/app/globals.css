@@ -3,8 +3,6 @@
    References: Aimé Leon Dore × Jacquemus × Dion Lee × Reformation
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@300;400;500&display=swap');
-
 :root {
   --bass:           #0D0D10;
   --bass-soft:      #161619;
@@ -13,16 +11,16 @@
   --bass-line-soft: rgba(242, 235, 221, 0.04);
   --cream:          #F2EBDD;
   --ivory:          #E8DFCB;
-  --cream-50:       rgba(242, 235, 221, 0.50);
+  --cream-50:       rgba(242, 235, 221, 0.72);
   --cream-25:       rgba(242, 235, 221, 0.25);
   --cream-10:       rgba(242, 235, 221, 0.10);
   --pink:           #D947A8;
   --pink-soft:      rgba(217, 71, 168, 0.15);
   --gold:           #D9B44A;
   --gold-soft:      rgba(217, 180, 74, 0.18);
-  --serif:    'Cormorant Garamond', Georgia, serif;
-  --sans:     'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --mono:     'DM Mono', 'SF Mono', Menlo, monospace;
+  --serif:    var(--font-stush-serif), 'Cormorant Garamond', Georgia, serif;
+  --sans:     var(--font-stush-sans), 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono:     var(--font-stush-mono), 'DM Mono', 'SF Mono', Menlo, monospace;
   --ease-luxury:  cubic-bezier(0.23, 1, 0.32, 1);
   --ease-velvet:  cubic-bezier(0.77, 0, 0.175, 1);
   --t-quick:      220ms;
@@ -162,7 +160,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .curtain:hover .curtain__panel--left  { transform: translateX(-100%); }
 .curtain:hover .curtain__panel--right { transform: translateX(100%); }
 .curtain__meta { position: absolute; left: 10px; right: 10px; bottom: 10px; z-index: 3; display: flex; justify-content: space-between; align-items: end; gap: 8px; pointer-events: none; transition: opacity var(--t-quick); }
-.curtain__name { font-family: var(--serif); font-weight: 400; font-size: 13px; line-height: 1.2; color: var(--bass); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; letter-spacing: 0.005em; }
+.curtain__name { font-family: var(--serif); font-weight: 500; font-size: 14px; line-height: 1.25; color: var(--bass); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; letter-spacing: 0.005em; }
 .curtain__price { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--bass-graphite); white-space: nowrap; }
 .curtain__add { position: absolute; left: 10px; right: 10px; bottom: 10px; z-index: 4; padding: 10px 10px; background: var(--bass); color: #ffffff; font-family: var(--sans); font-size: 8px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; text-align: center; opacity: 0; transform: translateY(10px); transition: opacity var(--t-quick) var(--ease-luxury), transform var(--t-smooth) var(--ease-luxury), background var(--t-quick); pointer-events: auto; }
 .curtain:hover .curtain__add { opacity: 1; transform: translateY(0); transition-delay: 250ms; }

@@ -171,7 +171,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 @media (max-width: 1280px) { .product-grid { grid-template-columns: repeat(5, 1fr); } }
 @media (max-width: 1050px) { .product-grid { grid-template-columns: repeat(4, 1fr); } }
 @media (max-width: 760px)  { .product-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 420px)  { .product-grid { grid-template-columns: 1fr; } }
+@media (max-width: 420px)  { .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 .curtain { position: relative; aspect-ratio: 3 / 4; overflow: hidden; background: #ffffff; display: block; text-decoration: none; color: inherit; }
 .curtain__base { position: absolute; inset: 4%; width: 92%; height: 92%; object-fit: contain; object-position: center; filter: none; }

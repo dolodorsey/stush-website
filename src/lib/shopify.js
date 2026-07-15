@@ -34,7 +34,7 @@ async function publicFetch(path) {
 
 // Fetches STUSH brand collection directly — auto-populates from tag rule brand:stush
 export async function getProducts(opts = {}) {
-  const { limit = 60 } = opts;
+  const { limit = 250 } = opts;
   const data = await publicFetch(`/collections/stush-usa/products.json?limit=${limit}`);
   return data?.products ?? [];
 }
@@ -63,7 +63,7 @@ export async function getCollectionByHandle(handle) {
   return data?.collection ?? null;
 }
 
-export async function getCollectionProducts(handleOrId, limit = 60) {
+export async function getCollectionProducts(handleOrId, limit = 250) {
   if (!handleOrId) return [];
   // Public endpoint uses handle. If a numeric ID was passed (from collections.json response),
   // look up its handle from the full collections list.

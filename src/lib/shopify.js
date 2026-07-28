@@ -11,6 +11,8 @@ export const CART_ORIGIN = `https://${CHECKOUT_HOST}`;
 
 const UA = 'Mozilla/5.0 (compatible; StushWeb/1.0)';
 const BRAND_TAG = 'brand:stush';
+const BRAND_SOURCE_QUERY = 'utm_source=stush&utm_medium=storefront&utm_campaign=brand_store&brand_source=stush&landing_brand=stush';
+const BRAND_CART_QUERY = `${BRAND_SOURCE_QUERY}&attributes%5Bbrand_source%5D=stush&attributes%5Blanding_brand%5D=stush`;
 
 async function publicFetch(path) {
   const url = `${FETCH_ORIGIN}${path}`;
@@ -99,8 +101,16 @@ export const SHOP_URL = CART_ORIGIN;
 
 // Build cart-add deeplink — points to the store's custom domain
 export function cartAddUrl(variantId, quantity = 1) {
-  if (!variantId) return `${CART_ORIGIN}/cart`;
-  return `${CART_ORIGIN}/cart/${variantId}:${quantity}`;
+  if (!variantId) return `${CART_ORIGIN}/cart?${BRAND_CART_QUERY}`;
+  return `${CART_ORIGIN}/cart/${variantId}:${quantity}?${BRAND_CART_QUERY}`;
+}
+
+export function productUrl(handle) {
+  return `${CART_ORIGIN}/products/${handle}?${BRAND_SOURCE_QUERY}`;
+}
+
+export function collectionUrl(handle = 'stush-usa') {
+  return `${CART_ORIGIN}/collections/${handle}?${BRAND_SOURCE_QUERY}`;
 }
 
 // Convert raw HTML body to a safe, readable string

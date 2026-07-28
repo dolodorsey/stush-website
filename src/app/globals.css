@@ -229,10 +229,11 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 @media (max-width: 980px) { .pdp { grid-template-columns: 1fr; } }
 .pdp__gallery { display: grid; gap: 1px; background: #e8e4de; }
 .pdp__img { width: 100%; aspect-ratio: 3/4; object-fit: contain; object-position: center; background: #ffffff; padding: 5%; }
-.pdp__info { position: sticky; top: 100px; align-self: start; display: grid; gap: 20px; }
+/* Not sticky: the info column now carries the full spec copy and can run taller
+   than the viewport, which would strand the care line and CTA off-screen. */
+.pdp__info { align-self: start; display: grid; gap: 20px; }
 .pdp__title { font-family: var(--serif); font-weight: 300; font-size: clamp(24px, 3vw, 40px); line-height: 1; letter-spacing: -0.02em; }
 .pdp__price { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--gold); letter-spacing: 0.02em; }
-.pdp__desc { font-size: 12px; line-height: 1.65; color: var(--cream-50); max-width: 400px; }
 .pdp__variants { display: grid; gap: 10px; }
 .pdp__var-label { font-family: var(--sans); font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cream-50); }
 .pdp__var-options { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -240,6 +241,117 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .pdp__var-opt:hover { border-color: var(--cream); }
 .pdp__var-opt[aria-pressed="true"] { background: var(--cream); color: var(--bass); border-color: var(--cream); }
 .pdp__cta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+
+/* PDP DESCRIPTION — first-party HTML injected from Shopify (specs, care, size charts).
+   Shopify's editor ships inline styles (helvetica, 14px, hard margins); the !important
+   declarations below strip that presentation back to STUSH's editorial type scale. */
+.pdp__description { max-width: 460px; font-family: var(--sans); font-size: 12px; line-height: 1.7; color: var(--cream-50); }
+.pdp__description p,
+.pdp__description li,
+.pdp__description span,
+.pdp__description div,
+.pdp__description a {
+  font-family: var(--sans) !important;
+  font-size: 12px !important;
+  line-height: 1.7 !important;
+  letter-spacing: 0 !important;
+  color: inherit !important;
+}
+.pdp__description p { margin: 0 0 14px !important; padding: 0 !important; }
+.pdp__description > :last-child { margin-bottom: 0 !important; }
+.pdp__description strong, .pdp__description b { font-weight: 500; color: var(--cream); }
+.pdp__description em, .pdp__description i { font-family: var(--serif); font-style: italic; }
+.pdp__description a { text-decoration: underline; text-underline-offset: 3px; }
+.pdp__description a:hover { color: var(--pink) !important; }
+.pdp__description img { margin: 16px 0; }
+
+/* Section labels — Shopify authors these as bold divs, h3 or h4 */
+.pdp__description h3,
+.pdp__description h4,
+.pdp__description h5,
+.pdp__description > div {
+  font-family: var(--sans) !important;
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  line-height: 1.35 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase;
+  color: var(--cream) !important;
+  margin: 24px 0 10px !important;
+  padding: 0 !important;
+}
+.pdp__description > :first-child { margin-top: 0 !important; }
+
+/* Spec bullets — hairline rule instead of a dot */
+.pdp__description ul,
+.pdp__description ol {
+  margin: 0 0 16px !important;
+  padding: 0 !important;
+  list-style: none !important;
+  display: grid;
+  gap: 8px;
+}
+.pdp__description li { margin: 0 !important; padding: 0 0 0 18px !important; position: relative; list-style: none !important; }
+.pdp__description li::before { content: ''; position: absolute; left: 0; top: 0.68em; width: 8px; height: 1px; background: var(--cream-25); }
+
+/* Size charts — scroll horizontally instead of blowing out the layout on mobile */
+.pdp__description table {
+  display: block;
+  width: 100% !important;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 0 !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  margin: 20px 0 !important;
+  table-layout: auto !important;
+}
+.pdp__description colgroup, .pdp__description col { width: auto !important; }
+.pdp__description th,
+.pdp__description td {
+  font-family: var(--mono) !important;
+  font-size: 9px !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.04em !important;
+  color: var(--cream-50) !important;
+  white-space: nowrap;
+  text-align: center !important;
+  padding: 8px 12px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--bass-line) !important;
+}
+.pdp__description thead th,
+.pdp__description tbody tr:first-child td,
+.pdp__description tr:first-child th {
+  color: var(--cream) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.12em !important;
+  border-bottom-color: var(--cream-25) !important;
+}
+.pdp__description th:first-child,
+.pdp__description td:first-child {
+  position: sticky;
+  left: 0;
+  text-align: left !important;
+  background: var(--bass);
+  color: var(--cream) !important;
+  padding-left: 0 !important;
+}
+.pdp__description tbody tr:last-child td { border-bottom: 0 !important; }
+
+/* Care line — the closing note gets its own break */
+.pdp__description > p:last-child:not(:only-child) {
+  margin: 24px 0 0 !important;
+  padding-top: 18px !important;
+  border-top: 1px solid var(--bass-line);
+  font-family: var(--mono) !important;
+  font-size: 9px !important;
+  line-height: 1.7 !important;
+  letter-spacing: 0.03em !important;
+  color: var(--cream-50) !important;
+}
+@media (max-width: 980px) { .pdp__description { max-width: none; } }
 
 /* COLLECTION GRID */
 .collection-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(12px, 1.25vw, 20px); background: transparent; padding: 0; align-items: start; }

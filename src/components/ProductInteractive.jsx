@@ -6,9 +6,9 @@ import { useState, useMemo } from 'react';
 // Props:
 //   product   — full Shopify Admin product JSON
 //   store     — 'https://bodgeaworldwide.myshopify.com' (already includes protocol)
-//   description — plain-text description (pre-computed on server)
+//   descriptionHtml — raw first-party body_html from Shopify (spec bullets, care line, size chart)
 
-export default function ProductInteractive({ product, store, description }) {
+export default function ProductInteractive({ product, store, descriptionHtml }) {
   const images = product.images || [];
   const variants = product.variants || [];
   const optionNames = (product.options || []).filter(o => o.name !== 'Title');
@@ -121,7 +121,13 @@ export default function ProductInteractive({ product, store, description }) {
           )}
         </div>
 
-        {description && <p className="pdp__desc">{description}</p>}
+        {/* Full first-party product copy from Shopify — specs, care, size chart */}
+        {descriptionHtml && (
+          <div
+            className="pdp__description"
+            dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+          />
+        )}
 
         {/* Variant options — INTERACTIVE */}
         {optionNames.map(opt => (

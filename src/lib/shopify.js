@@ -11,6 +11,9 @@ export const CART_ORIGIN = `https://${CHECKOUT_HOST}`;
 
 const UA = 'Mozilla/5.0 (compatible; StushWeb/1.0)';
 const BRAND_TAG = 'brand:stush';
+// Live smart collection — auto-populates from the brand:stush tag rule.
+// (The legacy 'stush-usa' manual collection is stale and no longer the source of truth.)
+const BRAND_COLLECTION = 'stush';
 const BRAND_SOURCE_QUERY = 'utm_source=stush&utm_medium=storefront&utm_campaign=brand_store&brand_source=stush&landing_brand=stush';
 const BRAND_CART_QUERY = `${BRAND_SOURCE_QUERY}&attributes%5Bbrand_source%5D=stush&attributes%5Blanding_brand%5D=stush`;
 
@@ -37,7 +40,7 @@ async function publicFetch(path) {
 // Fetches STUSH brand collection directly — auto-populates from tag rule brand:stush
 export async function getProducts(opts = {}) {
   const { limit = 250 } = opts;
-  const data = await publicFetch(`/collections/stush-usa/products.json?limit=${limit}`);
+  const data = await publicFetch(`/collections/${BRAND_COLLECTION}/products.json?limit=${limit}`);
   return data?.products ?? [];
 }
 
@@ -49,13 +52,18 @@ export async function getProductByHandle(handle) {
 
 // -------- collections --------
 
+// Every published collection on the store — used for id -> handle resolution.
+async function getAllCollections() {
+  const data = await publicFetch('/collections.json?limit=250');
+  return data?.collections ?? [];
+}
+
 export async function getCollections() {
-  const data = await publicFetch('/collections.json?limit=50');
-  const all = data?.collections ?? [];
+  const all = await getAllCollections();
   // Filter to STUSH-relevant collections (brand + type subcategories)
   return all.filter(c => {
     const h = c.handle || '';
-    return h === 'stush-usa';
+    return h === BRAND_COLLECTION;
   });
 }
 
@@ -71,7 +79,9 @@ export async function getCollectionProducts(handleOrId, limit = 250) {
   // look up its handle from the full collections list.
   let handle = handleOrId;
   if (/^\d+$/.test(String(handleOrId))) {
-    const colls = await getCollections();
+    // Resolve against the full collection list so /collections/[handle] keeps
+    // working for any published collection, not just the brand collection.
+    const colls = await getAllCollections();
     const match = colls.find(c => String(c.id) === String(handleOrId));
     if (!match?.handle) return [];
     handle = match.handle;
@@ -109,7 +119,7 @@ export function productUrl(handle) {
   return `${CART_ORIGIN}/products/${handle}?${BRAND_SOURCE_QUERY}`;
 }
 
-export function collectionUrl(handle = 'stush-usa') {
+export function collectionUrl(handle = BRAND_COLLECTION) {
   return `${CART_ORIGIN}/collections/${handle}?${BRAND_SOURCE_QUERY}`;
 }
 

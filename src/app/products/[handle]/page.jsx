@@ -19,13 +19,13 @@ export default async function ProductPage({ params }) {
   const product = await getProductByHandle(params.handle);
   if (!product) notFound();
 
-  const description = plainDescription(product.body_html, 600);
-
+  // First-party Shopify copy — spec bullets, care line, size charts.
+  // Rendered as real HTML on the PDP, never stripped or truncated.
   return (
     <ProductInteractive
       product={product}
       store={STORE_URL}
-      description={description}
+      descriptionHtml={product.body_html || ''}
     />
   );
 }

@@ -41,6 +41,6 @@ export async function POST(request) {
   });
 
   return NextResponse.json({
-    checkoutUrl: `${STORE}/cart/${selected.id}:${Math.max(1, Number(quantity) || 1)}?${params}`,
+    checkoutUrl: `${STORE}/cart/${selected.id}:${Math.max(1, Number(quantity) || 1)}?checkout&${params}`,
   });
 }

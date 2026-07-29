@@ -12,6 +12,9 @@ export default function ProductInteractive({ product, descriptionHtml }) {
   const images = product.images || [];
   const variants = product.variants || [];
   const optionNames = (product.options || []).filter(o => o.name !== 'Title');
+  const hasSupplierSpecCover =
+    images.length > 1 &&
+    /(cap|hat|visor)/i.test(`${product.product_type || ''} ${product.title || ''}`);
 
   const firstAvailable = variants.find(variant => variant.available !== false) || variants[0];
 
@@ -25,7 +28,7 @@ export default function ProductInteractive({ product, descriptionHtml }) {
     return initial;
   });
 
-  const [mainImgIdx, setMainImgIdx] = useState(0);
+  const [mainImgIdx, setMainImgIdx] = useState(hasSupplierSpecCover ? 1 : 0);
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
 
@@ -56,7 +59,7 @@ export default function ProductInteractive({ product, descriptionHtml }) {
     const imageIndex = images.findIndex(image =>
       (imageId && image.id === imageId) || (imageSrc && image.src === imageSrc)
     );
-    if (imageIndex >= 0) setMainImgIdx(imageIndex);
+    if (imageIndex >= 0) setMainImgIdx(hasSupplierSpecCover && imageIndex === 0 ? 1 : imageIndex);
   };
 
   const mainImg = images[mainImgIdx] || images[0];

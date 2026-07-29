@@ -16,9 +16,15 @@ export default function CurtainCard({ product, priority = false }) {
   if (!product) return null;
   const variant = product.variants?.find(item => item.available !== false) || product.variants?.[0];
   const variantImage = product.images?.find(image => image.id === variant?.image_id)?.src;
-  const cover = variantImage || product.images?.[0]?.src;
+  const hasSupplierSpecCover =
+    product.images?.length > 1 &&
+    /(cap|hat|visor)/i.test(`${product.product_type || ''} ${product.title || ''}`) &&
+    (!variantImage || variantImage === product.images?.[0]?.src);
+  const cover = hasSupplierSpecCover
+    ? product.images[1]?.src
+    : variantImage || product.images?.[0]?.src;
   const reveal =
-    product.images?.find(image => image.src !== cover)?.src ||
+    product.images?.find((image, index) => image.src !== cover && (!hasSupplierSpecCover || index !== 0))?.src ||
     pickHoverImage(product);
   const price = formatPrice(variant?.price);
   const productUrl = `/products/${product.handle}`;

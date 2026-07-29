@@ -13,12 +13,14 @@ export default function ProductInteractive({ product, store, descriptionHtml }) 
   const variants = product.variants || [];
   const optionNames = (product.options || []).filter(o => o.name !== 'Title');
 
-  // Initialize selected options from first variant
+  const firstAvailable = variants.find(variant => variant.available !== false) || variants[0];
+
+  // Initialize selected options from the first purchasable variant.
   const [selected, setSelected] = useState(() => {
     const initial = {};
     optionNames.forEach((opt, idx) => {
       const optionKey = `option${idx + 1}`;
-      initial[opt.name] = variants[0]?.[optionKey] || opt.values[0];
+      initial[opt.name] = firstAvailable?.[optionKey] || opt.values[0];
     });
     return initial;
   });
@@ -44,10 +46,20 @@ export default function ProductInteractive({ product, store, descriptionHtml }) 
   const price = fmt(currentVariant?.price);
   const comparePrice = currentVariant?.compare_at_price ? fmt(currentVariant.compare_at_price) : null;
 
-  const inStock = currentVariant?.inventory_quantity > 0 || currentVariant?.inventory_policy === 'continue';
+  const inStock = currentVariant?.available !== false;
 
   const selectOption = (name, value) => {
-    setSelected(prev => ({ ...prev, [name]: value }));
+    const next = { ...selected, [name]: value };
+    setSelected(next);
+    const match = variants.find(variant =>
+      optionNames.every((option, index) => variant[`option${index + 1}`] === next[option.name])
+    );
+    const imageId = match?.image_id || match?.featured_image?.id;
+    const imageSrc = match?.featured_image?.src;
+    const imageIndex = images.findIndex(image =>
+      (imageId && image.id === imageId) || (imageSrc && image.src === imageSrc)
+    );
+    if (imageIndex >= 0) setMainImgIdx(imageIndex);
   };
 
   const mainImg = images[mainImgIdx] || images[0];
@@ -163,8 +175,8 @@ export default function ProductInteractive({ product, store, descriptionHtml }) 
           <a
             href={cartUrl}
             className="btn-primary"
-            aria-disabled={!currentVariant}
-            style={{ opacity: currentVariant ? 1 : 0.5, pointerEvents: currentVariant ? 'auto' : 'none' }}
+            aria-disabled={!currentVariant || !inStock}
+            style={{ opacity: currentVariant && inStock ? 1 : 0.5, pointerEvents: currentVariant && inStock ? 'auto' : 'none' }}
           >
             {inStock === false ? 'Sold Out' : 'Add to Bag'}
           </a>

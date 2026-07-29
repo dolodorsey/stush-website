@@ -14,9 +14,12 @@ import { formatPrice, pickHoverImage, cartAddUrl } from '@/lib/shopify';
  */
 export default function CurtainCard({ product, priority = false }) {
   if (!product) return null;
-  const cover = product.images?.[0]?.src;
-  const reveal = pickHoverImage(product);
-  const variant = product.variants?.[0];
+  const variant = product.variants?.find(item => item.available !== false) || product.variants?.[0];
+  const variantImage = product.images?.find(image => image.id === variant?.image_id)?.src;
+  const cover = variantImage || product.images?.[0]?.src;
+  const reveal =
+    product.images?.find(image => image.src !== cover)?.src ||
+    pickHoverImage(product);
   const price = formatPrice(variant?.price);
   const productUrl = `/products/${product.handle}`;
 

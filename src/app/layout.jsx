@@ -24,6 +24,7 @@ const mono = DM_Mono({
 });
 
 export const metadata = {
+  metadataBase: new URL('https://stushusa.com'),
   title: 'STUSH — Editorial Empire from Atlanta',
   description: 'Streetwear for the room. From Atlanta. For the world. Designed pieces, runway-grade construction, hand-crafted statements.',
   openGraph: {

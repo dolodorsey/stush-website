@@ -1,5 +1,5 @@
 'use client';
-import { formatPrice, pickHoverImage, cartAddUrl } from '@/lib/shopify';
+import { formatPrice, pickHoverImage } from '@/lib/shopify';
 
 /**
  * CurtainCard — STUSH signature interaction.
@@ -65,18 +65,7 @@ export default function CurtainCard({ product, priority = false }) {
         <span className="curtain__price">{price}</span>
       </div>
 
-      {variant?.id && (
-        <button
-          type="button"
-          className="curtain__add"
-          onClick={(e) => {
-            e.preventDefault();
-            window.location.href = cartAddUrl(variant.id, 1);
-          }}
-        >
-          Add to bag
-        </button>
-      )}
+      {variant?.id && <span className="curtain__add">View the piece</span>}
     </a>
   );
 }

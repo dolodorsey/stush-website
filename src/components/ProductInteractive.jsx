@@ -8,7 +8,7 @@ import { useState, useMemo } from 'react';
 //   store     — 'https://bodgeaworldwide.myshopify.com' (already includes protocol)
 //   descriptionHtml — raw first-party body_html from Shopify (spec bullets, care line, size chart)
 
-export default function ProductInteractive({ product, store, descriptionHtml }) {
+export default function ProductInteractive({ product, descriptionHtml }) {
   const images = product.images || [];
   const variants = product.variants || [];
   const optionNames = (product.options || []).filter(o => o.name !== 'Title');
@@ -26,6 +26,8 @@ export default function ProductInteractive({ product, store, descriptionHtml }) 
   });
 
   const [mainImgIdx, setMainImgIdx] = useState(0);
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState('');
 
   // Compute the currently selected variant based on selected options
   const currentVariant = useMemo(() => {
@@ -35,11 +37,6 @@ export default function ProductInteractive({ product, store, descriptionHtml }) 
       optionNames.every((opt, idx) => v[`option${idx + 1}`] === selected[opt.name])
     ) || variants[0];
   }, [selected, variants, optionNames]);
-
-  // Cart URL for the currently selected variant
-  const cartUrl = currentVariant?.id
-    ? `${store}/cart/${currentVariant.id}:1`
-    : `${store}/cart`;
 
   // Format price
   const fmt = (v) => v ? `$${parseFloat(v).toFixed(0)}` : '';
@@ -63,6 +60,30 @@ export default function ProductInteractive({ product, store, descriptionHtml }) 
   };
 
   const mainImg = images[mainImgIdx] || images[0];
+
+  const beginCheckout = async () => {
+    if (!currentVariant || !inStock) return;
+    setCheckingOut(true);
+    setCheckoutError('');
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productHandle: product.handle,
+          variantId: currentVariant.id,
+          variantTitle: currentVariant.title,
+          quantity: 1,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.checkoutUrl) throw new Error(data.message || 'Checkout is unavailable.');
+      window.location.assign(data.checkoutUrl);
+    } catch (error) {
+      setCheckoutError(error instanceof Error ? error.message : 'Checkout is unavailable.');
+      setCheckingOut(false);
+    }
+  };
 
   return (
     <div className="pdp">
@@ -172,15 +193,23 @@ export default function ProductInteractive({ product, store, descriptionHtml }) 
 
         {/* CTAs */}
         <div className="pdp__cta">
-          <a
-            href={cartUrl}
+          <button
+            type="button"
+            onClick={beginCheckout}
             className="btn-primary"
+            disabled={checkingOut || !currentVariant || !inStock}
             aria-disabled={!currentVariant || !inStock}
             style={{ opacity: currentVariant && inStock ? 1 : 0.5, pointerEvents: currentVariant && inStock ? 'auto' : 'none' }}
           >
-            {inStock === false ? 'Sold Out' : 'Add to Bag'}
-          </a>
+            {inStock === false ? 'Sold Out' : checkingOut ? 'Preparing private checkout…' : 'Acquire this piece'}
+          </button>
           <a href="/shop" className="btn-ghost">Continue Shopping</a>
+        </div>
+        {checkoutError && <p className="pdp__checkout-error" role="alert">{checkoutError}</p>}
+        <div className="pdp__assurance" aria-label="Purchase assurances">
+          <span>Live edition verification</span>
+          <span>Secure Shopify checkout</span>
+          <span>Curated fulfillment</span>
         </div>
 
         {/* Details */}

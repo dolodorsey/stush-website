@@ -403,3 +403,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   .marquee-track, .announce__track { animation: none !important; }
 }
+.pdp__assurance { margin-top: 22px; padding: 18px 0; border-top: 1px solid var(--bass-line); border-bottom: 1px solid var(--bass-line); display: grid; gap: 9px; }
+.pdp__assurance span { font-family: var(--font-mono); font-size: 9px; letter-spacing: .18em; text-transform: uppercase; display: flex; justify-content: space-between; }
+.pdp__assurance span::after { content: "VERIFIED"; color: var(--gold); }
+.pdp__checkout-error { color: #9f2f24; font-size: 12px; line-height: 1.5; }

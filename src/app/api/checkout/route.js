@@ -1,46 +1,47 @@
 import { NextResponse } from 'next/server';
 
-const STORE = 'https://bodgeaworldwide.myshopify.com';
+const PAYMENT_RAIL = 'https://dzlmtvodpyhetvektfuo.supabase.co/functions/v1/khg-commerce-checkout';
 
 export async function POST(request) {
-  const { productHandle, variantId, variantTitle, quantity = 1 } = await request.json();
-  if (!productHandle || !variantId) {
-    return NextResponse.json({ message: 'Choose an available product option.' }, { status: 400 });
+  try {
+    const { productHandle, variantId, variantTitle, quantity = 1 } = await request.json();
+    if (!productHandle || !variantId) {
+      return NextResponse.json({ message: 'Choose an available product option.' }, { status: 400 });
+    }
+
+    const origin = new URL(request.url).origin;
+    const response = await fetch(PAYMENT_RAIL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: origin },
+      cache: 'no-store',
+      body: JSON.stringify({
+        brand_key: 'stush',
+        return_origin: origin,
+        lines: [{
+          productHandle,
+          variantId,
+          variantTitle: variantTitle || '',
+          quantity: Math.max(1, Math.min(10, Number(quantity) || 1)),
+        }],
+      }),
+    });
+
+    const data = await response.json();
+    if (!response.ok || !data.checkoutUrl) {
+      return NextResponse.json(
+        { message: data.error || 'Secure checkout is temporarily unavailable.' },
+        { status: response.status || 502 }
+      );
+    }
+
+    return NextResponse.json({
+      checkoutUrl: data.checkoutUrl,
+      checkoutSessionId: data.session_id,
+      paymentId: data.payment_id,
+      provider: 'stripe',
+    });
+  } catch (error) {
+    console.error('STUSH Stripe checkout error', error);
+    return NextResponse.json({ message: 'Secure checkout is temporarily unavailable.' }, { status: 500 });
   }
-
-  const response = await fetch(`${STORE}/products/${encodeURIComponent(productHandle)}.js`, {
-    cache: 'no-store',
-    headers: { Accept: 'application/json' },
-  });
-  if (!response.ok) {
-    return NextResponse.json({ message: 'This product could not be verified.' }, { status: 502 });
-  }
-
-  const product = await response.json();
-  const variants = product.variants || [];
-  const normalizedId = String(variantId).replace(/^gid:\/\/shopify\/ProductVariant\//, '');
-  const exact = variants.find(item => String(item.id) === normalizedId && item.available);
-  const replacement = variants.find(item => item.title === variantTitle && item.available);
-  const selected = exact || replacement;
-
-  if (!selected) {
-    return NextResponse.json(
-      { message: 'That selection is no longer available. Choose another option.' },
-      { status: 409 }
-    );
-  }
-
-  const params = new URLSearchParams({
-    utm_source: 'stush',
-    utm_medium: 'storefront',
-    utm_campaign: 'brand_store',
-    brand_source: 'stush',
-    landing_brand: 'stush',
-    'attributes[brand_source]': 'stush',
-    'attributes[landing_brand]': 'stush',
-  });
-
-  return NextResponse.json({
-    checkoutUrl: `${STORE}/cart/${selected.id}:${Math.max(1, Number(quantity) || 1)}?checkout&${params}`,
-  });
 }

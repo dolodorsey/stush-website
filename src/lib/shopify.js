@@ -17,7 +17,8 @@ const BRAND_COLLECTION = 'stush';
 const BRAND_SOURCE_QUERY = 'utm_source=stush&utm_medium=storefront&utm_campaign=brand_store&brand_source=stush&landing_brand=stush';
 const BRAND_CART_QUERY = `${BRAND_SOURCE_QUERY}&attributes%5Bbrand_source%5D=stush&attributes%5Blanding_brand%5D=stush`;
 
-async function publicFetch(path) {
+async function publicFetch(path, options = {}) {
+  const { silent404 = false } = options;
   const url = `${FETCH_ORIGIN}${path}`;
   try {
     const res = await fetch(url, {
@@ -25,7 +26,9 @@ async function publicFetch(path) {
       cache: 'no-store',
     });
     if (!res.ok) {
-      console.error(`Shopify ${res.status}: ${path}`);
+      // Old campaign/product URLs can outlive a Shopify handle. That is a normal
+      // merchandising miss, not a production runtime failure.
+      if (!(silent404 && res.status === 404)) console.error(`Shopify ${res.status}: ${path}`);
       return null;
     }
     return res.json();
@@ -46,7 +49,7 @@ export async function getProducts(opts = {}) {
 
 export async function getProductByHandle(handle) {
   if (!handle) return null;
-  const data = await publicFetch(`/products/${handle}.json`);
+  const data = await publicFetch(`/products/${handle}.json`, { silent404: true });
   return data?.product ?? null;
 }
 

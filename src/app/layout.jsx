@@ -1,4 +1,5 @@
 import './globals.css';
+import './merchandising.css';
 import { Bodoni_Moda, DM_Mono, DM_Sans } from 'next/font/google';
 import MobileMenu from '@/components/MobileMenu';
 import NavScroll from '@/components/NavScroll';
@@ -57,7 +58,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
       <body>
-        {/* Top marquee — wakes the page up */}
         <aside className="announce" aria-label="Site announcements">
           <div className="announce__track">
             {[0,1].map(loop => (
@@ -111,9 +111,10 @@ export default function RootLayout({ children }) {
             <div>
               <div className="footer__heading">Collections</div>
               <a href="/collections/stush"      className="footer__link">The Full Empire</a>
-              <a href="/shop"                    className="footer__link">Shop All</a>
-              <a href="/lookbook"                className="footer__link">Lookbook</a>
-              <a href="/journal"                 className="footer__link">Journal</a>
+              <a href="/collections/stush#tops" className="footer__link">Tees & Tops</a>
+              <a href="/collections/stush#outerwear" className="footer__link">Outerwear</a>
+              <a href="/collections/stush#bottoms" className="footer__link">Bottoms</a>
+              <a href="/collections/stush#accessories" className="footer__link">Accessories</a>
             </div>
             <div>
               <div className="footer__heading">Studio</div>

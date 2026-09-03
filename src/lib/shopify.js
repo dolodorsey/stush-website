@@ -72,7 +72,11 @@ export async function getCollections() {
 
 export async function getCollectionByHandle(handle) {
   if (!handle) return null;
-  const data = await publicFetch(`/collections/${handle}.json`);
+  // Arbitrary retired campaign handles can still be requested by old backlinks,
+  // crawlers, and saved customer URLs. A missing Shopify collection is an expected
+  // content miss; Next.js will render the route-level 404 without polluting the
+  // production error stream.
+  const data = await publicFetch(`/collections/${handle}.json`, { silent404: true });
   return data?.collection ?? null;
 }
 

@@ -43,111 +43,202 @@ export default async function HomePage() {
           playsInline
           preload="auto"
           poster={heroImg || ''}
-        >
-          <source src="/campaigns/stush-hero.mp4" type="video/mp4" />
-        </video>
-        <div className="hero__scrim" />
-        <div className="hero__content">
-          <p className="hero__eyebrow">Atlanta / Worldwide</p>
-          <h1 className="hero__title">STUSH</h1>
-          <p className="hero__tagline">Quiet luxury. Loud presence.</p>
-          <div className="hero__actions">
-            <a className="btn btn--light" href="/shop">Shop the edit</a>
-            <a className="btn btn--ghost" href="/lookbook">View lookbook</a>
+          src="/STUSH_VID.mp4"
+        />
+        <div className="hero__overlay" />
+        <div className="hero__inner">
+          <div>
+            <div className="hero__meta fadeUp">
+              <span className="eyebrow eyebrow--gold">SS &bull; 26 Collection</span>
+            </div>
+            <h1 className="hero__title fadeUp-2">
+              dressed for<br />
+              <em><span className="hero__title-accent">THE</span> room</em>
+            </h1>
+          </div>
+          <div className="hero__sidebar fadeUp-3">
+            <p className="hero__sub">
+              An editorial house from Atlanta. Statement pieces, runway-grade construction,
+              and the confidence to wear it all.
+            </p>
+            <div className="hero__actions">
+              <a href="/shop" className="btn-primary">Enter the Empire</a>
+              <a href="/lookbook" className="btn-ghost">Lookbook</a>
+            </div>
           </div>
         </div>
-        <a className="hero__scroll" href="#edit" aria-label="Scroll to collection">Scroll</a>
       </section>
 
-      {/* ═══════ 2. EDITORIAL MARQUEE ═══════ */}
-      <section className="marquee" aria-label="STUSH brand message">
-        <div className="marquee__track">
-          {[0, 1].map(copy => (
-            <div className="marquee__line" key={copy} aria-hidden={copy === 1}>
-              <span>STUSH</span><i>✦</i><em>Quiet Luxury</em><i>✦</i><span>Atlanta</span><i>✦</i><em>Worldwide</em><i>✦</i>
-            </div>
+      {/* ═══════ 2. MARQUEE STRIP ═══════ */}
+      <section className="marquee-section" aria-hidden="true">
+        <div className="marquee-track">
+          {[0,1].map(loop => (
+            <span key={loop}>
+              {['Outerwear', 'Blazers', 'Denim', 'Accessories', 'Sets', 'Atelier', 'Editorial', 'Atlanta'].map(w => (
+                <span className="marquee-item" key={loop + w}>{w}</span>
+              ))}
+            </span>
           ))}
         </div>
       </section>
 
-      {/* ═══════ 3. SHOP EDIT ═══════ */}
-      <section className="edit" id="edit">
-        <div className="section-head">
-          <div>
-            <span className="section-kicker">The current collection</span>
-            <h2 className="section-title">Shop the <em>edit</em></h2>
-          </div>
-          <a href="/shop" className="text-link">View all {allProducts.length ? `(${allProducts.length})` : ''} →</a>
+      {/* ═══════ 3. SHOP BY TYPE ═══════ */}
+      <section className="category-index">
+        <div className="collection-strip__head">
+          <h2 className="collection-strip__title">
+            Shop by <em>Type</em>
+          </h2>
+          <a href="/shop" className="eyebrow eyebrow--gold" style={{ paddingBottom: 6 }}>
+            Shop All →
+          </a>
         </div>
-
-        {allProducts.length ? (
-          <div className="collection-grid collection-grid--home">
-            {allProducts.slice(0, 8).map((product, index) => (
-              <CurtainCard key={product.id} product={product} priority={index < 4} />
-            ))}
-          </div>
-        ) : (
-          <div className="empty-state">
-            <p>The next STUSH edit is loading.</p>
-            <a className="btn btn--dark" href={SHOP_URL}>Visit the shop</a>
-          </div>
-        )}
+        <div className="category-index__links">
+          {productSections.map(section => (
+            <a key={section.id} href={`/shop#${section.id}`} className="category-index__link">
+              <span>{section.label}</span>
+              <small>{section.products.length}</small>
+            </a>
+          ))}
+        </div>
       </section>
 
-      {/* ═══════ 4. CATEGORY MERCHANDISING ═══════ */}
-      {productSections.slice(0, 3).map(section => (
-        <section className="edit edit--category" key={section.key}>
-          <div className="section-head">
-            <div>
-              <span className="section-kicker">{section.eyebrow}</span>
-              <h2 className="section-title">{section.label}</h2>
-            </div>
-            <a href="/shop" className="text-link">Shop all →</a>
+      {/* ═══════ SUPABASE EDITORIAL CAMPAIGNS ═══════ */}
+      <section className="editorial-archive" aria-label="STUSH visual archive">
+        <header className="editorial-archive__intro">
+          <span className="eyebrow eyebrow--pink">The campaign</span>
+          <h2 className="editorial-archive__title">The STUSH<br /><em>edit.</em></h2>
+        </header>
+        <div className="editorial-archive__grid">
+        {EDITORIAL_FRAMES.map((frame, index) => (
+          <figure className="editorial-frame" key={frame.src}>
+            <img
+              src={frame.src}
+              alt={`STUSH ${frame.label} campaign`}
+              className="editorial-frame__image"
+              loading="lazy"
+            />
+            <figcaption className="editorial-frame__caption">
+              <span>{frame.label}</span><span>{String(index + 1).padStart(2, '0')}</span>
+            </figcaption>
+          </figure>
+        ))}
+        </div>
+      </section>
+
+      {/* ═══════ 4. STORY ═══════ */}
+      <section className="story">
+        <div className="story__inner">
+          <span className="eyebrow story__eyebrow">The Story</span>
+          <h2 className="story__head">
+            We don&rsquo;t make <em>clothes</em>.<br />
+            We make <span className="accent">entrances</span>.
+          </h2>
+          <div className="story__body">
+            <p>
+              <strong>STUSH started with a single blazer and a city that never asked permission.</strong>{' '}
+              Atlanta raised us — the music, the hustle, the rooms you have to earn your way into.
+              Every piece is designed for that moment when the door opens and the conversation stops.
+            </p>
+            <p>
+              Runway-grade construction. Street-born attitude. Limited runs because the room
+              isn&rsquo;t for everyone. This isn&rsquo;t fashion — it&rsquo;s armor for people
+              who already know who they are.
+            </p>
           </div>
-          <div className="collection-grid collection-grid--home">
-            {section.products.slice(0, 4).map(product => (
-              <CurtainCard key={product.id} product={product} />
+          <div className="story__signature">
+            <span className="story__sig-text">Dr. Dorsey</span>
+            <span className="meta story__sig-meta">— Founder &amp; Creative Director</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ 5. PRODUCT GRID (CURTAIN CARDS) ═══════ */}
+      {/* ═══════ ATELIER (gold boutique) ═══════ */}
+      <section style={{
+        position: 'relative',
+        minHeight: '100svh',
+        display: 'flex',
+        alignItems: 'center',
+        padding: 'clamp(60px,10vw,120px) var(--gutter)',
+        background: 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.85) 100%), url(/brand/STUSH_ATELIER.png) center/cover no-repeat',
+        color: 'var(--cream)',
+      }}>
+        <div style={{maxWidth: 780, margin: '0 auto', textAlign: 'center'}}>
+          <span className="eyebrow" style={{color: 'var(--gold)', letterSpacing: '0.24em'}}>THE ATELIER</span>
+          <h2 className="story__head" style={{marginTop: 20, marginBottom: 24, fontSize: 'clamp(36px, 5vw, 68px)'}}>
+            Made in the <em>Room</em>.
+          </h2>
+          <p className="story__body" style={{maxWidth: 620, margin: '0 auto', fontSize: 'clamp(15px, 1.2vw, 18px)', lineHeight: 1.75}}>
+            Every piece cut, sewn, and finished by hand. Runway-grade construction.
+            Limited runs. The Empire opens its doors to the ones who belong inside.
+          </p>
+          <div style={{marginTop: 40, display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap'}}>
+            <a href="/lookbook" className="btn btn--cream">See the Lookbook →</a>
+            <a href="/shop" className="btn btn--gold-outline">Shop the Empire</a>
+          </div>
+        </div>
+      </section>
+
+      {productSections.slice(0, 5).map((section, sectionIndex) => (
+        <section className="product-section" key={section.id}>
+          <div className="product-section__head">
+            <h2 className="collection-strip__title">{section.label}</h2>
+            <a href={`/shop#${section.id}`} className="eyebrow eyebrow--gold" style={{ paddingBottom: 6 }}>
+              View {section.products.length} →
+            </a>
+          </div>
+          <div className="product-grid">
+            {section.products.slice(0, 6).map((product, index) => (
+              <CurtainCard key={product.id} product={product} priority={sectionIndex === 0 && index < 6} />
             ))}
           </div>
         </section>
       ))}
 
-      {/* ═══════ 5. EDITORIAL CAMPAIGN ═══════ */}
-      <section className="campaign-strip">
-        {EDITORIAL_FRAMES.slice(0, 3).map((frame, index) => (
-          <figure className={index === 1 ? 'campaign-strip__frame campaign-strip__frame--tall' : 'campaign-strip__frame'} key={frame.src}>
-            <img src={frame.src} alt={`STUSH — ${frame.label}`} loading="lazy" />
-            <figcaption>{frame.label}</figcaption>
-          </figure>
-        ))}
+      {/* ═══════ 6. SECOND MARQUEE ═══════ */}
+      <section className="marquee-section" aria-hidden="true">
+        <div className="marquee-track" style={{ animationDirection: 'reverse' }}>
+          {[0,1].map(loop => (
+            <span key={loop}>
+              {['From Atlanta', 'For the World', 'Editorial Empire', 'Stush', 'Dressed for the Room'].map(w => (
+                <span className="marquee-item" key={loop + w}>{w}</span>
+              ))}
+            </span>
+          ))}
+        </div>
       </section>
 
-      {/* ═══════ 6. BRAND STATEMENT ═══════ */}
-      <section className="statement">
-        <p className="statement__kicker">The STUSH code</p>
-        <p className="statement__copy">
-          For people who never needed to be <em>loud</em> to be noticed.
-          Built in Atlanta. Worn everywhere.
-        </p>
-        <a className="text-link text-link--light" href="/lookbook">Enter the lookbook →</a>
-      </section>
-
-      {/* ═══════ 7. CAMPAIGN GRID ═══════ */}
-      <section className="campaign-grid" aria-label="STUSH campaigns">
-        {EDITORIAL_FRAMES.slice(3).map(frame => (
-          <figure className="campaign-grid__item" key={frame.src}>
-            <img src={frame.src} alt={`STUSH — ${frame.label}`} loading="lazy" />
-            <figcaption>{frame.label}</figcaption>
-          </figure>
-        ))}
-      </section>
-
-      {/* ═══════ 8. SOCIETY ═══════ */}
+      {/* ═══════ 7. SOCIETY (EMAIL SIGNUP) ═══════ */}
       <section className="society" id="society">
-        <span className="society__eyebrow">Private access</span>
-        <h2>Join the <em>Society</em></h2>
-        <p>First access to new drops, private edits, and STUSH experiences.</p>
-        <a className="btn btn--light" href="/forms/society">Request access</a>
+        <div className="society__inner">
+          <span className="eyebrow society__eyebrow">The Society</span>
+          <h2 className="society__head">
+            First dibs.<br />
+            <em>Always.</em>
+          </h2>
+          <p className="society__sub">
+            New drops, lookbook exclusives, and invitations to rooms
+            most people don&rsquo;t know exist.
+          </p>
+          <form
+            className="society__form"
+            action={`${SHOP_URL}/contact#contact_form`}
+            method="POST"
+          >
+            <input
+              type="email"
+              name="contact[email]"
+              className="society__input"
+              placeholder="Your email address"
+              required
+              autoComplete="email"
+            />
+            <button type="submit" className="society__submit">Join →</button>
+          </form>
+          <span className="society__legal">
+            No spam. Unsubscribe anytime. We respect the culture.
+          </span>
+        </div>
       </section>
     </>
   );

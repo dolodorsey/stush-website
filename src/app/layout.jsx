@@ -1,9 +1,11 @@
 import './globals.css';
 import './merchandising.css';
 import './extreme-flagship.css';
+import './experience.css';
 import { Bodoni_Moda, DM_Mono, DM_Sans } from 'next/font/google';
 import MobileMenu from '@/components/MobileMenu';
 import NavScroll from '@/components/NavScroll';
+import ExperienceLayer from '@/components/ExperienceLayer';
 
 const serif = Bodoni_Moda({ subsets: ['latin'], weight: ['400','500','600','700'], style: ['normal','italic'], variable: '--font-stush-serif', display: 'swap' });
 const sans = DM_Sans({ subsets: ['latin'], weight: ['300','400','500','700'], variable: '--font-stush-sans', display: 'swap' });
@@ -29,6 +31,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
       <body>
+        <ExperienceLayer />
         <aside className="announce" aria-label="Site announcements"><div className="announce__track">{[0,1].map(loop=><span key={loop} aria-hidden={loop===1}>{ANNOUNCE_LINES.map((line,i)=><span className="announce__item" key={`${loop}-${i}`}>{line}<span className="announce__dot"/></span>)}</span>)}</div></aside>
         <NavScroll />
         <nav className="nav" aria-label="Primary">

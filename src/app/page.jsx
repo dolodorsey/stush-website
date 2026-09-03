@@ -2,6 +2,11 @@ import { getProducts, SHOP_URL } from '@/lib/shopify';
 import CurtainCard from '@/components/CurtainCard';
 import { groupProductsByType } from '@/lib/productCategories';
 
+// The storefront intentionally reads live Shopify inventory with cache: 'no-store'.
+// Declare that contract at the route boundary so Next.js does not attempt static
+// prerendering and then surface its internal dynamic-render sentinel as a Shopify error.
+export const dynamic = 'force-dynamic';
+
 const EDITORIAL_FRAMES = [
   { src: '/campaigns/stush-real-product.png', label: 'The Real Product Edit' },
   { src: 'https://dzlmtvodpyhetvektfuo.supabase.co/storage/v1/object/public/brand-graphics/stush/stush_brooklyn_stoop/045_stush___fafo_brooklyn_stoop.jpg', label: 'Elevated Essentials' },

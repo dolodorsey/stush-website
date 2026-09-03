@@ -37,15 +37,23 @@ jobs:
           npm run start > /tmp/stush-next.log 2>&1 &
           pid=$!
           trap 'kill "$pid" || true' EXIT
+
+          ready=false
           for attempt in {1..20}; do
-            if curl --silent --fail --output /dev/null http://127.0.0.1:3000/; then
+            if curl --silent --fail --max-time 5 --output /dev/null http://127.0.0.1:3000/; then
+              ready=true
               break
             fi
             sleep 1
           done
 
+          if [ "$ready" != "true" ]; then
+            cat /tmp/stush-next.log
+            exit 1
+          fi
+
           for path in all the-outerwear-vault the-sets-edit; do
-            headers="$(curl --silent --show-error --head "http://127.0.0.1:3000/collections/$path")"
+            headers="$(curl --silent --show-error --head --max-time 5 "http://127.0.0.1:3000/collections/$path" | tr -d '\r')"
             printf '%s\n' "$headers"
-            printf '%s\n' "$headers" | grep -Eiq '^location: /collections/stush\r?$'
+            printf '%s\n' "$headers" | grep -Eiq '^location: /collections/stush$'
           done

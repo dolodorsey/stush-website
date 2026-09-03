@@ -1,134 +1,50 @@
 import './globals.css';
 import './merchandising.css';
+import './extreme-flagship.css';
 import { Bodoni_Moda, DM_Mono, DM_Sans } from 'next/font/google';
 import MobileMenu from '@/components/MobileMenu';
 import NavScroll from '@/components/NavScroll';
 
-const serif = Bodoni_Moda({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-stush-serif',
-  display: 'swap',
-});
-const sans = DM_Sans({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '700'],
-  variable: '--font-stush-sans',
-  display: 'swap',
-});
-const mono = DM_Mono({
-  subsets: ['latin'],
-  weight: ['300', '400', '500'],
-  variable: '--font-stush-mono',
-  display: 'swap',
-});
+const serif = Bodoni_Moda({ subsets: ['latin'], weight: ['400','500','600','700'], style: ['normal','italic'], variable: '--font-stush-serif', display: 'swap' });
+const sans = DM_Sans({ subsets: ['latin'], weight: ['300','400','500','700'], variable: '--font-stush-sans', display: 'swap' });
+const mono = DM_Mono({ subsets: ['latin'], weight: ['300','400','500'], variable: '--font-stush-mono', display: 'swap' });
 
 export const metadata = {
   metadataBase: new URL('https://stushusa.com'),
-  title: 'STUSH — Editorial Empire from Atlanta',
-  description: 'Streetwear for the room. From Atlanta. For the world. Designed pieces, runway-grade construction, hand-crafted statements.',
-  openGraph: {
-    title: 'STUSH',
-    description: 'Editorial Empire from Atlanta.',
-    type: 'website',
-    url: 'https://stushusa.com',
-    images: ['/campaigns/stush-real-product.png'],
-  },
+  title: 'STUSH — Dressed for the Room',
+  description: 'An editorial fashion house from Atlanta. Limited pieces, sharp tailoring, street intelligence and clothes designed to hold a room.',
+  openGraph: { title: 'STUSH — Dressed for the Room', description: 'An editorial fashion house from Atlanta.', type: 'website', url: 'https://stushusa.com', images: ['/campaigns/stush-real-product.png'] },
 };
 
-const SHOPIFY = 'https://bodgeaworldwide.myshopify.com';
-
 const NAV = [
-  { label: 'Shop',         href: '/shop' },
-  { label: 'Collections',  href: '/collections' },
-  { label: 'Lookbook',     href: '/lookbook' },
-  { label: 'Journal',      href: '/journal' },
-  { label: 'Society',      href: '/#society' },
+  { label: 'Shop', href: '/shop' },
+  { label: 'Collections', href: '/collections' },
+  { label: 'Lookbook', href: '/lookbook' },
+  { label: 'Journal', href: '/journal' },
+  { label: 'Society', href: '/#society' },
 ];
-
-const ANNOUNCE_LINES = [
-  'New season — The Editorial Empire',
-  'Complimentary US shipping over $250',
-  'Atelier pieces — limited runs only',
-  'Stush. From Atlanta. For the room.',
-];
+const ANNOUNCE_LINES = ['SS26 — Dressed for the Room','Limited Atelier releases','From Atlanta. For the World.','The Society receives first access'];
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
       <body>
-        <aside className="announce" aria-label="Site announcements">
-          <div className="announce__track">
-            {[0,1].map(loop => (
-              <span key={loop} aria-hidden={loop === 1}>
-                {ANNOUNCE_LINES.map((line, i) => (
-                  <span className="announce__item" key={loop + '-' + i}>
-                    {line}
-                    <span className="announce__dot" />
-                  </span>
-                ))}
-              </span>
-            ))}
-          </div>
-        </aside>
-
+        <aside className="announce" aria-label="Site announcements"><div className="announce__track">{[0,1].map(loop=><span key={loop} aria-hidden={loop===1}>{ANNOUNCE_LINES.map((line,i)=><span className="announce__item" key={`${loop}-${i}`}>{line}<span className="announce__dot"/></span>)}</span>)}</div></aside>
         <NavScroll />
         <nav className="nav" aria-label="Primary">
           <a href="/" className="nav__logo">Stush</a>
-          <ul className="nav__links">
-            {NAV.map(n => (
-              <li key={n.label}>
-                <a href={n.href} className="nav__link">{n.label}</a>
-              </li>
-            ))}
-            <li>
-              <a href={`${SHOPIFY}/cart`} className="nav__link nav__link--bag">Bag</a>
-            </li>
-          </ul>
+          <ul className="nav__links">{NAV.map(n=><li key={n.label}><a href={n.href} className="nav__link">{n.label}</a></li>)}<li><a href="/cart" className="nav__link nav__link--bag">Bag</a></li></ul>
           <MobileMenu />
         </nav>
-
         <main>{children}</main>
-
         <footer className="footer">
           <div className="footer__top">
-            <div>
-              <div className="footer__brand">Stush</div>
-              <p className="footer__desc">
-                An editorial house from Atlanta. Designed pieces for the room, the runway, and the
-                people who refuse to dress for everyone else.
-              </p>
-            </div>
-            <div>
-              <div className="footer__heading">The Empire</div>
-              <a href="/shop"        className="footer__link">Shop All</a>
-              <a href="/collections" className="footer__link">Collections</a>
-              <a href="/lookbook"    className="footer__link">Lookbook</a>
-              <a href="/journal"     className="footer__link">Journal</a>
-              <a href="/#society"    className="footer__link">The Society</a>
-            </div>
-            <div>
-              <div className="footer__heading">Collections</div>
-              <a href="/collections/stush"      className="footer__link">The Full Empire</a>
-              <a href="/collections/stush#tops" className="footer__link">Tees & Tops</a>
-              <a href="/collections/stush#outerwear" className="footer__link">Outerwear</a>
-              <a href="/collections/stush#bottoms" className="footer__link">Bottoms</a>
-              <a href="/collections/stush#accessories" className="footer__link">Accessories</a>
-            </div>
-            <div>
-              <div className="footer__heading">Studio</div>
-              <a href={`${SHOPIFY}/pages/contact`}            className="footer__link">Contact</a>
-              <a href={`${SHOPIFY}/policies/shipping-policy`} className="footer__link">Shipping</a>
-              <a href={`${SHOPIFY}/policies/refund-policy`}   className="footer__link">Returns</a>
-              <a href="mailto:THEDOCTORDORSEY@gmail.com"      className="footer__link">Press</a>
-              <a href="tel:4048199609"                        className="footer__link">(404) 819-9609</a>
-            </div>
+            <div><div className="footer__brand">Stush</div><p className="footer__desc">An editorial house from Atlanta. Pieces for the room, the runway and the people who refuse to dress for everyone else.</p></div>
+            <div><div className="footer__heading">The House</div><a href="/shop" className="footer__link">Shop</a><a href="/collections" className="footer__link">Collections</a><a href="/lookbook" className="footer__link">Lookbook</a><a href="/journal" className="footer__link">Journal</a></div>
+            <div><div className="footer__heading">Private Access</div><a href="/#society" className="footer__link">The Society</a><a href="/forms/inquiry" className="footer__link">Client Services</a><a href="/forms/influencer" className="footer__link">Creative Partnerships</a><a href="/forms/sponsor" className="footer__link">Brand Partnerships</a></div>
+            <div><div className="footer__heading">Atlanta</div><span className="footer__link">Editorial House</span><span className="footer__link">Limited Runs</span><span className="footer__link">Global Delivery</span></div>
           </div>
-          <div className="footer__bottom">
-            <span className="footer__copy">© {new Date().getFullYear()} Stush — From Atlanta. For the World.</span>
-            <span className="footer__copy">SS / FW / Forever — Atlanta, GA</span>
-          </div>
+          <div className="footer__bottom"><span className="footer__copy">© {new Date().getFullYear()} STUSH — DRESSED FOR THE ROOM</span><span className="footer__copy">A KOLLECTIVE COMPANY · ATLANTA</span></div>
         </footer>
       </body>
     </html>

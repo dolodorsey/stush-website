@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { validateStushCheckoutSelection } from '@/lib/shopify';
 
 const PAYMENT_RAIL = 'https://dzlmtvodpyhetvektfuo.supabase.co/functions/v1/khg-commerce-checkout';
 const PAYMENT_RAIL_TIMEOUT_MS = 5_000;
@@ -38,9 +39,36 @@ export async function POST(request) {
       return checkoutResponse({ message: 'Checkout request is invalid.' }, 400, requestId);
     }
 
-    const { productHandle, variantId, variantTitle, quantity = 1 } = payload || {};
+    const { productHandle, variantId, quantity = 1 } = payload || {};
     if (!validIdentifier(productHandle, 120) || !validIdentifier(variantId)) {
       return checkoutResponse({ message: 'Choose an available product option.' }, 400, requestId);
+    }
+
+    const selection = await validateStushCheckoutSelection(productHandle, variantId);
+    if (!selection.ok) {
+      if (selection.reason === 'catalog_unavailable') {
+        console.error('STUSH catalog validation unavailable before checkout', {
+          requestId,
+          brand: 'stush',
+        });
+        return checkoutResponse(
+          { message: 'STUSH product verification is temporarily unavailable. Please try again shortly.' },
+          503,
+          requestId,
+          { 'Retry-After': '30' }
+        );
+      }
+
+      console.warn('STUSH rejected non-owned or unavailable checkout selection', {
+        requestId,
+        brand: 'stush',
+        reason: selection.reason,
+      });
+      return checkoutResponse(
+        { message: 'This STUSH product option is no longer available.' },
+        409,
+        requestId
+      );
     }
 
     const origin = new URL(request.url).origin;
@@ -58,9 +86,9 @@ export async function POST(request) {
         brand_key: 'stush',
         return_origin: origin,
         lines: [{
-          productHandle: String(productHandle),
-          variantId: String(variantId),
-          variantTitle: typeof variantTitle === 'string' ? variantTitle.slice(0, 180) : '',
+          productHandle: selection.productHandle,
+          variantId: selection.variantId,
+          variantTitle: selection.variantTitle,
           quantity: Math.max(1, Math.min(10, Number(quantity) || 1)),
         }],
       }),

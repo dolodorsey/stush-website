@@ -11,6 +11,7 @@ export const CART_ORIGIN = `https://${CHECKOUT_HOST}`;
 
 const UA = 'Mozilla/5.0 (compatible; StushWeb/1.0)';
 const BRAND_TAG = 'brand:stush';
+const CATALOG_VALIDATION_TIMEOUT_MS = 4_000;
 // Live smart collection — auto-populates from the brand:stush tag rule.
 // (The legacy 'stush-usa' manual collection is stale and no longer the source of truth.)
 const BRAND_COLLECTION = 'stush';
@@ -35,6 +36,63 @@ async function publicFetch(path, options = {}) {
   } catch (err) {
     console.error(`Shopify fetch error (${path}): ${err.message}`);
     return null;
+  }
+}
+
+function normalizeTags(tags) {
+  if (Array.isArray(tags)) return tags.map(tag => String(tag).trim().toLowerCase()).filter(Boolean);
+  return String(tags || '')
+    .split(',')
+    .map(tag => tag.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+// Checkout must never trust a browser-supplied variant ID. Before the payment rail
+// is called, verify that the requested handle is still tagged for STUSH and that the
+// requested variant belongs to that exact STUSH product. This prevents a caller from
+// injecting a sibling-brand/shared-store variant into the STUSH checkout contract.
+export async function validateStushCheckoutSelection(handle, variantId) {
+  const safeHandle = String(handle || '').trim();
+  const safeVariantId = String(variantId || '').trim();
+  if (!safeHandle || !safeVariantId) return { ok: false, reason: 'invalid_selection' };
+
+  try {
+    const res = await fetch(`${FETCH_ORIGIN}/products/${encodeURIComponent(safeHandle)}.json`, {
+      headers: { 'User-Agent': UA, 'Accept': 'application/json' },
+      cache: 'no-store',
+      signal: AbortSignal.timeout(CATALOG_VALIDATION_TIMEOUT_MS),
+    });
+
+    if (res.status === 404) return { ok: false, reason: 'not_found' };
+    if (!res.ok) return { ok: false, reason: 'catalog_unavailable' };
+
+    const data = await res.json();
+    const product = data?.product;
+    if (!product) return { ok: false, reason: 'not_found' };
+
+    const tags = normalizeTags(product.tags);
+    if (!tags.includes(BRAND_TAG)) return { ok: false, reason: 'not_stush' };
+
+    const variant = Array.isArray(product.variants)
+      ? product.variants.find(item => String(item?.id) === safeVariantId)
+      : null;
+
+    if (!variant || variant.available === false) {
+      return { ok: false, reason: 'variant_unavailable' };
+    }
+
+    return {
+      ok: true,
+      productHandle: String(product.handle || safeHandle),
+      variantId: String(variant.id),
+      variantTitle: typeof variant.title === 'string' ? variant.title.slice(0, 180) : '',
+    };
+  } catch (error) {
+    console.error('STUSH catalog validation unavailable', {
+      brand: 'stush',
+      error: error instanceof Error ? error.name : 'unknown',
+    });
+    return { ok: false, reason: 'catalog_unavailable' };
   }
 }
 

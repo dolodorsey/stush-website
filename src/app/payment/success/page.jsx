@@ -1,20 +1,22 @@
-export const metadata = { title: 'Order confirmed | STUSH' };
+export const metadata = { title: 'Order Confirmed — STUSH' };
 
 export default async function PaymentSuccessPage({ searchParams }) {
   const params = await searchParams;
   const sessionId = typeof params?.session_id === 'string' ? params.session_id : '';
+
   return (
-    <main style={{ minHeight: '78vh', display: 'grid', placeItems: 'center', padding: '56px 20px', background: '#090909', color: '#f7f2eb' }}>
-      <section style={{ width: 'min(680px,100%)', textAlign: 'center' }}>
-        <p style={{ fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', opacity: .58 }}>STUSH × Secure checkout</p>
-        <h1 style={{ fontSize: 'clamp(42px,8vw,78px)', lineHeight: .95, margin: '18px 0' }}>Order confirmed.</h1>
-        <p style={{ maxWidth: 540, margin: '0 auto', fontSize: 16, lineHeight: 1.7, opacity: .7 }}>Your Stripe payment was accepted and the STUSH order is being reconciled into the brand order ledger for fulfillment.</p>
-        {sessionId && <p style={{ marginTop: 18, fontSize: 10, opacity: .35, wordBreak: 'break-all' }}>Checkout: {sessionId}</p>}
-        <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 10, marginTop: 30 }}>
-          <a href="/shop" style={{ padding: '13px 20px', background: '#f7f2eb', color: '#090909', textDecoration: 'none', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.1em', fontSize: 10 }}>Keep shopping</a>
-          <a href="/" style={{ padding: '13px 20px', border: '1px solid rgba(255,255,255,.2)', color: '#f7f2eb', textDecoration: 'none', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.1em', fontSize: 10 }}>STUSH home</a>
+    <section className="stush-utility-page stush-success-page">
+      <div className="stush-utility-card stush-success-card" data-stush-reveal>
+        <span className="stush-utility-kicker">STUSH / ORDER CONFIRMED</span>
+        <span className="stush-success-mark" aria-hidden="true">✓</span>
+        <h1>The room is yours.</h1>
+        <p>Your payment was accepted. Your STUSH order is now moving into fulfillment. Order and shipping updates will follow through the contact information used at checkout.</p>
+        {sessionId && <p className="stush-success-reference">REFERENCE / {sessionId}</p>}
+        <div className="stush-utility-actions">
+          <a href="/shop" className="btn-primary">Continue shopping</a>
+          <a href="/lookbook" className="btn-ghost">View lookbook</a>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
   );
 }

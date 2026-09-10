@@ -1,0 +1,92 @@
+name: Export STUSH active product images
+
+on:
+  push:
+    branches:
+      - ops/export-stush-product-images-20260910
+    paths:
+      - .github/workflows/export-stush-active-product-images.yml
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download current active product hero images
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p images
+          cat > /tmp/stush-images.txt <<'EOF'
+          women-s-color-block-v-neck-crop-t-shirt|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/0a4c9fa10f8e45839882a656c3ac094f.png?v=1783847732
+          contrast-collar-short-sleeve-polo-shirt|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/cd2f706ccc8e4fc188194e497b0a9ce2.png?v=1783846473
+          plaid-waistband-barrel-sweatpants|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/061663c40db74c3080b1f469fcecb5a4.png?v=1783845918
+          curved-stripe-straight-sweatpants|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/2c4870578b6a4f5eb9bf03ade2195a65.png?v=1783847042
+          contrast-raglan-sleeve-mesh-t-shirt|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/dc2b36d79f9f47149556ff85d8be382e.png?v=1783845468
+          contrast-piped-button-up-jersey|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/d78f45482809451eadef6ed5495c664b.png?v=1783843034
+          essential-contrast-polo-shirt-2|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/c17c5e6e226c493fa51a2f84b917c3ba_5bd72baa-5291-4251-b40d-dceba7728209.png?v=1783844853
+          essential-cotton-boxy-t-shirt-1|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/8d204f5e86694abf99e68c223ef88003_f2d642c8-4736-429d-b7aa-cb5dddfc4ee1.png?v=1783846530
+          contrast-side-stripe-fleece-cropped-track-jacket|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/c9af9703b2da41e0bf68d70cc26fbbe3.png?v=1783846578
+          snow-washed-raw-edge-cropped-sweatshirt|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/4439b473a47b417dacfd3b7837b49d9f.png?v=1783846812
+          essential-slim-fit-mock-neck-t-shirt|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/391f02b6169a4a468f033c849857260d.png?v=1783845553
+          v-neck-contrast-collar-boxy-sweatshirt|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/cf675b63e1294ca18a8bd3d8cfa3d716.png?v=1783846833
+          classic-stripe-trim-basketball-shorts|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/bd3f6331cb8a453d8c83553fbee42826.png?v=1783847537
+          side-stripe-straight-leg-pants-7|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/38c1402986f24c29a9383b9d4f02cab4_57259e3e-ea27-4558-a4e8-4ae7e77f86d9.png?v=1783845947
+          flared-sweatpants-3|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/d6c6393acbaf497b8c0295c91ebc60c4.png?v=1783846509
+          sunfade-curved-blade-fleece-sweatpants|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/518dc5d667ca44f3a64223a701c12acc.png?v=1783846459
+          vintage-washed-zip-up-hooded-tank-top|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/22b84e70733f42838eddcbb2a46a4ba8.png?v=1783847012
+          unisex-trucker-hat-with-white-half-mesh-1|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/250060-d2536809-54ef-431f-8a77-4d90cad70dd9.jpg?v=1783842209
+          contrast-stitched-fleece-sweatpants-1|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/6b208c0d2adb430cb40aa7aa975e32eb_2d1b168c-4138-4311-98f9-af9b9f7fc61a.png?v=1783847672
+          snow-washed-straight-leg-pants-3|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/8f933d45a5a7457b9a53eb8b64eed4d5.png?v=1783846444
+          striped-v-neck-soccer-jersey|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/56ba5e4ea2fe4b3db11ba9f746e5ef0a.png?v=1783847433
+          contrast-stripes-polo-collar-t-shirt-2|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/988ed3a18e574dc3b29c95ee8d12ae56_c459d0e2-581a-4bac-9554-604aef048bb7.png?v=1783846127
+          reverse-washed-tank-top|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/99b12686d28f4cf9acd8c0a72439ae6a.png?v=1783846937
+          essential-straight-leg-sweatpants-1|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/acdbfa636b934a95a6ff55640ec0325d_125b1d99-d2d6-43b0-a1e4-a2edd02a0ca5.png?v=1783847397
+          contrast-collar-short-sleeve-polo-shirt-3|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/b92e8ed1de3b43b88b4ead60081063e3_f0f3fa32-c93e-49f9-9373-70af08092064.png?v=1783847718
+          unisex-striped-loose-v-neck-t-shirt-3|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/91878e53f4d344b0ad469c4385db1aaf.png?v=1783847785
+          contrast-piped-panel-t-shirt-1|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/74b2cc4e62a24a24bc92f4201f1c073e_fde6c465-2b98-405f-8f15-effc1e7b005b.png?v=1783848078
+          contrast-raglan-sleeve-baseball-jacket|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/bcd16abc11b94b1eb700c8f6caa2c37d.png?v=1783845047
+          oversized-mesh-v-neck-soccer-jersey|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/4a0166b278fe496c8cd395b24aa992b0.png?v=1783847463
+          cropped-half-zip-hoodie-1|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/56c17192492c447ba29a190d91a542c8_40b22b51-cd40-4c09-9f32-4bdcaec6f80a.png?v=1783847795
+          v-neck-lapel-crop-top-2|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/52652596403b488d881bd1d8d26bbc90.png?v=1783843140
+          men-s-lightweight-sport-jersey|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/3045926ff9ad45deaaea71ab8094a04b.png?v=1783844577
+          belted-barrel-leg-chino-pants|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/3984ee5e8688420dad21785081ab673d.png?v=1783846494
+          women-s-cropped-dolman-t-shirt-17|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/dde035a264c0413982e6c74ad19343ca_e3d8e505-a26b-4926-b0d4-78150a721671.png?v=1783844681
+          snow-wash-heavyweight-sweatpants|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/12645fe4cd5a4ee984b6b7d61c200f79.png?v=1783845573
+          contrast-side-stripe-fleece-track-jacket|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/feb00fbd011348459d19c16970e6bc58.png?v=1783846524
+          taped-cooling-performance-crop-top-1|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/a818cc55d1164b9b9016c220abd05f80_cf829a97-0452-4dd1-999b-d0d3f213ae52.png?v=1783844612
+          flared-sweatpants|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/d6dd557c794040a4b69cc0121418e204.png?v=1783844792
+          raw-edge-boxy-non-shrink-t-shirt-1|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/dd8631b3ae8f42bd967d300f1d53e193.png?v=1783843372
+          side-stripe-straight-leg-pants-1|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/4d5749dea29b413b8d2c86326d5c7794.png?v=1783842940
+          contrast-stitched-cotton-t-shirt-2|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/082a382b2b9349f69f2d7097a3515fa0_fd22849e-7a0a-4abc-bec1-47ec6aaa4749.png?v=1783846187
+          essential-zip-up-fleeced-varsity-jacket|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/4a8909f806d7480bbd05459bb5f14a13.png?v=1783846668
+          snow-wash-drawstring-cotton-pants-1|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/46f0e134bcdd40d9a96fd31dd9910582_d246b3e5-01eb-4ee1-ba8c-3c6e542bf894.png?v=1783845963
+          snow-washed-straight-leg-pants|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/965bd4133c2f4bd69cfc51b01ca52e25.png?v=1783846038
+          vintage-washed-flared-fleece-pants|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/431a7affc92a47a1a828bba5c8b30274.png?v=1783845798
+          dirty-washed-fleece-sweatpants|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/c4cda21c72964d339766f2bc00230777.png?v=1783846452
+          zip-through-boxy-fleece-hoodie|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/30725a7cc49643969f38d95f2a84d612.png?v=1783846728
+          sunfaded-edge-fleece-sweatpants-1|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/fd0a249534c244c98fccdc81d749a207_bf3abfd6-cbfb-428b-b82b-508b9524baed.png?v=1783845862
+          snow-washed-zip-through-fleece-hoodie|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/f6addb86b1c042a994a3ec3beb49d35c.png?v=1783846697
+          women-s-cropped-dolman-t-shirt-15|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/b14d8bb440314773895e27a16650a329_badb45ef-2d84-430f-b79d-b5839ae6cded.png?v=1783844628
+          heavyweight-wide-leg-panel-sweatpants-5|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/0c748cf0281b41c68f1a70f98feea956_823f334b-fb30-47ed-8354-8ee34657c265.png?v=1783846157
+          striped-waist-wide-leg-pants|https://cdn.shopify.com/s/files/1/0759/7506/5791/files/86cd4b2f35ae47c6b7b65f7bfcc7d9c9.png?v=1783845874
+          EOF
+
+          while IFS='|' read -r handle url; do
+            [ -n "$handle" ] || continue
+            clean="${url%%\?*}"
+            ext="${clean##*.}"
+            curl -L --fail --retry 3 --silent --show-error "$url" -o "images/${handle}.${ext}"
+          done < /tmp/stush-images.txt
+
+          count=$(find images -type f | wc -l | tr -d ' ')
+          test "$count" = "52"
+          printf 'Downloaded %s active STUSH product hero images\n' "$count" > images/README.txt
+
+      - name: Upload export artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stush-active-product-images-2026-09-10
+          path: images/
+          if-no-files-found: error
+          retention-days: 7

@@ -1,10 +1,16 @@
 import { getCollections, getCollectionProducts } from '@/lib/shopify';
 import { STUSH_CATEGORIES, groupStushProducts } from '@/lib/stush-categories';
+import { getCommerceLeadImage } from '@/lib/stush-merchandising';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Collections — STUSH' };
 
 const ALLOWED_HANDLES = ['stush'];
+
+function leadSrc(product) {
+  const image = getCommerceLeadImage(product);
+  return image?.src || image?.url || null;
+}
 
 export default async function CollectionsPage() {
   const collections = await getCollections();
@@ -15,9 +21,10 @@ export default async function CollectionsPage() {
     .map(category => ({
       ...category,
       products: grouped[category.key] || [],
-      image: grouped[category.key]?.[0]?.images?.[0]?.src || null,
+      image: leadSrc(grouped[category.key]?.[0]),
     }))
     .filter(category => category.products.length);
+  const heroImage = leadSrc(products?.[0]);
 
   return (
     <>
@@ -34,10 +41,8 @@ export default async function CollectionsPage() {
       </header>
 
       <section className="category-landing">
-        <a className="category-landing__hero" href="/collections/stush#all">
-          {products?.[0]?.images?.[0]?.src && (
-            <img src={products[0].images[0].src} alt="The STUSH collection" />
-          )}
+        <a className="category-landing__hero" href="/collections/stush#all" data-cursor="view">
+          {heroImage && <img src={heroImage} alt="The STUSH collection" />}
           <span className="category-landing__veil" />
           <span className="category-landing__copy">
             <small>Complete collection</small>
@@ -48,7 +53,7 @@ export default async function CollectionsPage() {
 
         <div className="category-landing__grid">
           {categories.map(category => (
-            <a key={category.key} href={`/collections/stush#${category.key}`} className="category-tile">
+            <a key={category.key} href={`/collections/stush#${category.key}`} className="category-tile" data-cursor="view">
               {category.image && <img src={category.image} alt={category.label} loading="lazy" />}
               <span className="category-landing__veil" />
               <span className="category-tile__copy">

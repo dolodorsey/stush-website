@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm install --no-fund --no-audit
 
+      - name: Verify STUSH commerce isolation
+        run: npm run verify:commerce-isolation
+
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
 
@@ -57,3 +60,6 @@ jobs:
             printf '%s\n' "$headers"
             printf '%s\n' "$headers" | grep -Eiq '^location: /collections/stush$'
           done
+
+          debug_status="$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 5 http://127.0.0.1:3000/api/debug-shopify)"
+          test "$debug_status" = "404"

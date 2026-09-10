@@ -2,6 +2,7 @@ import './globals.css';
 import './merchandising.css';
 import './extreme-flagship.css';
 import './experience.css';
+import './stush-fixes.css';
 import { Bodoni_Moda, DM_Mono, DM_Sans } from 'next/font/google';
 import MobileMenu from '@/components/MobileMenu';
 import NavScroll from '@/components/NavScroll';

@@ -17,15 +17,17 @@ export default function CollectionBrowser({ products = [], categories = [] }) {
     return () => window.removeEventListener('hashchange', syncFromHash);
   }, [validKeys]);
 
-  const filtered = active === 'all' ? products : products.filter(product => product.stushCategory === active);
+  const filtered = active === 'all'
+    ? products
+    : products.filter(product => (product.stushCategories || [product.stushCategory]).includes(active));
   const activeCategory = categories.find(category => category.key === active);
-  const title = active === 'all' ? 'The Full Edit' : activeCategory?.label || 'The Full Edit';
-  const eyebrow = active === 'all' ? 'STUSH / CURRENT COLLECTION' : activeCategory?.eyebrow || 'STUSH / CURRENT COLLECTION';
+  const title = active === 'all' ? 'The Current Edit' : activeCategory?.label || 'The Current Edit';
+  const eyebrow = active === 'all' ? 'STUSH / FALL 26' : activeCategory?.eyebrow || 'STUSH / FALL 26';
 
   const choose = (key) => {
     setActive(key);
     if (window.location.hash !== `#${key}`) history.replaceState(null, '', `#${key}`);
-    document.querySelector('.collection-browser__head')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    requestAnimationFrame(() => document.querySelector('.collection-browser__head')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   };
 
   return (
@@ -36,7 +38,7 @@ export default function CollectionBrowser({ products = [], categories = [] }) {
         </button>
         {categories.map(category => (
           <button type="button" key={category.key} className={active === category.key ? 'is-active' : ''} onClick={() => choose(category.key)} aria-pressed={active === category.key}>
-            <span>{category.label}</span><small>{category.count}</small>
+            <span>{category.label}</span><small>{category.count ?? 0}</small>
           </button>
         ))}
       </nav>
@@ -60,7 +62,7 @@ export default function CollectionBrowser({ products = [], categories = [] }) {
         </div>
       ) : (
         <div className="collection-browser__empty">
-          <span>THIS EDIT IS BEING CURATED.</span>
+          <span>{active === 'essentials' ? 'FALL ESSENTIALS ARE BEING LOADED.' : active === 'women' ? 'THE WOMEN’S EDIT IS BEING CURATED.' : 'THIS EDIT IS BEING CURATED.'}</span>
           <button type="button" onClick={() => choose('all')}>Return to all pieces</button>
         </div>
       )}

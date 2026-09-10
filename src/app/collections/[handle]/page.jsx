@@ -2,6 +2,7 @@ import { getCollectionByHandle, getCollectionProducts } from '@/lib/shopify';
 import { notFound } from 'next/navigation';
 import CollectionBrowser from '@/components/CollectionBrowser';
 import { STUSH_CATEGORIES, groupStushProducts, sortStushProducts, stushCategoryKey, stushCategoryKeys } from '@/lib/stush-categories';
+import { getCommerceCardProduct } from '@/lib/stush-merchandising';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +25,7 @@ export default async function CollectionPage({ params }) {
     count: grouped[category.key]?.length || 0,
   }));
   const merchProducts = products.map(product => ({
-    ...product,
+    ...getCommerceCardProduct(product),
     stushCategory: stushCategoryKey(product),
     stushCategories: stushCategoryKeys(product),
   }));

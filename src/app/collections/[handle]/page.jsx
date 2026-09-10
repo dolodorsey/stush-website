@@ -1,7 +1,7 @@
 import { getCollectionByHandle, getCollectionProducts } from '@/lib/shopify';
 import { notFound } from 'next/navigation';
 import CollectionBrowser from '@/components/CollectionBrowser';
-import { STUSH_CATEGORIES, groupStushProducts, stushCategoryKey } from '@/lib/stush-categories';
+import { STUSH_CATEGORIES, groupStushProducts, sortStushProducts, stushCategoryKey, stushCategoryKeys } from '@/lib/stush-categories';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,37 +15,27 @@ export default async function CollectionPage({ params }) {
   const col = await getCollectionByHandle(params.handle);
   if (!col) notFound();
 
-  const products = await getCollectionProducts(col.id, 120);
+  const products = sortStushProducts(await getCollectionProducts(col.id, 250));
   const grouped = groupStushProducts(products);
-  const categories = STUSH_CATEGORIES
-    .filter(category => grouped[category.key]?.length)
-    .map(category => ({
-      key: category.key,
-      label: category.label,
-      eyebrow: category.eyebrow,
-      count: grouped[category.key].length,
-    }));
+  const categories = STUSH_CATEGORIES.map(category => ({
+    key: category.key,
+    label: category.label,
+    eyebrow: category.eyebrow,
+    count: grouped[category.key]?.length || 0,
+  }));
   const merchProducts = products.map(product => ({
     ...product,
     stushCategory: stushCategoryKey(product),
+    stushCategories: stushCategoryKeys(product),
   }));
-
-  const words = col.title.split(' ');
-  const lastWord = words.pop();
-  const firstWords = words.join(' ');
 
   return (
     <>
       <header className="page-head page-head--collection page-head--collection-browser">
-        <span className="page-head__crumb">
-          <a href="/">Stush</a> / <a href="/collections">Collections</a> / {col.title}
-        </span>
-        <h1 className="page-head__title">
-          {firstWords} <em>{lastWord}</em>
-        </h1>
-        <p className="collection-intro">
-          Shop one clean edit. Filter by garment type without leaving the collection.
-        </p>
+        <span className="page-head__crumb"><a href="/">Stush</a> / <a href="/collections">Collections</a> / {col.title}</span>
+        <span className="page-head__season">FALL / WINTER 26</span>
+        <h1 className="page-head__title">Shop <em>STUSH</em></h1>
+        <p className="collection-intro">Browse one focused edit. Product-only merchandising, clean categories and no duplicate inventory walls.</p>
       </header>
 
       {products.length > 0 ? (

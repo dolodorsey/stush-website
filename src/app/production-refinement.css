@@ -1,0 +1,63 @@
+/* STUSH production refinement — Sept 10, 2026
+   Final visual corrections after live V2 audit. */
+
+/* The previous floating VIEW cursor and chapter rail distracted from product.
+   Keep native interaction cues and let the clothes carry the page. */
+.stush-cursor,
+.stush-seam{display:none!important}
+
+/* Product packshots in editorial chapters should read as merchandise, not cropped photography. */
+.flag-campaign{background:#f1ede6!important}
+.flag-campaign img{
+  object-fit:contain!important;
+  object-position:center!important;
+  padding:clamp(18px,2.7vw,44px)!important;
+  background:#f1ede6!important;
+}
+.flag-campaign>div{z-index:2}
+
+/* Keep optimized Next images pinned correctly inside card media. */
+.stush-product-card__media{isolation:isolate}
+.stush-product-card__img{z-index:0}
+.stush-product-card__action{z-index:2}
+
+/* Give keyboard users the same deliberate interaction hierarchy as pointer users. */
+.stush-product-card:focus-visible,
+.flag-campaign:focus-visible,
+.flag-link:focus-visible,
+.flag-btn:focus-visible,
+.nav__link:focus-visible,
+.footer__link:focus-visible{
+  outline:2px solid var(--stush-gold,#b48b3f)!important;
+  outline-offset:3px!important;
+}
+
+/* Homepage merchandise should arrive sooner and use tighter vertical rhythm. */
+.flag-product-edit--first{padding-top:clamp(58px,7vw,92px)!important}
+.flag-product-edit--first .flag-section-head{margin-bottom:clamp(30px,4vw,52px)!important}
+
+/* Mobile: preserve strong fashion scale without sacrificing shopping clarity. */
+@media(max-width:760px){
+  .flag-hero__media{object-position:center center!important}
+  .flag-product-grid,
+  .collection-browser__grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .collection-browser__grid{padding-inline:14px!important}
+  .collection-browser__head{padding-inline:16px!important}
+  .collection-browser__nav{padding-inline:14px!important}
+  .stush-product-card__meta{min-height:66px!important;padding:11px 10px 12px!important;gap:8px!important}
+  .stush-product-card__name{max-width:72%!important;font-size:11px!important;line-height:1.25!important}
+  .stush-product-card__price{font-size:10px!important}
+  .stush-product-card__action{display:none!important}
+  .flag-campaign{min-height:112vw!important}
+  .flag-campaign img{padding:16px!important}
+  .flag-campaign>div{padding:20px 16px!important}
+  .flag-campaign strong{font-size:clamp(30px,10vw,48px)!important}
+  .flag-section-head{margin-bottom:34px!important}
+  .flag-index__list a{min-height:82px!important}
+}
+
+@media(max-width:420px){
+  .flag-product-grid{gap:1px!important}
+  .collection-browser__summary{display:none!important}
+  .collection-browser__head h2{font-size:42px!important}
+}

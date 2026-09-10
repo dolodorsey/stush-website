@@ -16,6 +16,19 @@ function imageSrc(image) {
   return image?.src || image?.url || null;
 }
 
+function compactImage(image) {
+  if (!image) return null;
+  const src = imageSrc(image);
+  if (!src) return null;
+  return {
+    id: image.id || image.mediaId || src,
+    src,
+    alt: image.alt || image.altText || '',
+    width: image.width || 1400,
+    height: image.height || 1400,
+  };
+}
+
 export function isBackDesignFocal(product) {
   return BACK_FOCAL_PRODUCT.test(productText(product));
 }
@@ -82,4 +95,19 @@ export function getCommerceGalleryImages(product) {
 export function getCommerceHoverImage(product) {
   const gallery = getCommerceGalleryImages(product);
   return gallery[1] || null;
+}
+
+// Keep collection-browser client payloads lean. Product descriptions, every variant,
+// and full media galleries stay on the server; cards only receive what they render.
+export function getCommerceCardProduct(product) {
+  const variant = product?.variants?.find(item => item.available !== false) || product?.variants?.[0];
+  return {
+    id: product?.id,
+    title: product?.title || '',
+    handle: product?.handle || '',
+    price: variant?.price || null,
+    available: variant?.available !== false,
+    coverImage: compactImage(getCommerceLeadImage(product)),
+    hoverImage: compactImage(getCommerceHoverImage(product)),
+  };
 }

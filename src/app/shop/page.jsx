@@ -1,6 +1,7 @@
 import { getProducts } from '@/lib/shopify';
 import CollectionBrowser from '@/components/CollectionBrowser';
 import { STUSH_CATEGORIES, groupStushProducts, sortStushProducts, stushCategoryKeys, stushCategoryKey } from '@/lib/stush-categories';
+import { getCommerceCardProduct } from '@/lib/stush-merchandising';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Shop — STUSH' };
@@ -15,7 +16,7 @@ export default async function ShopPage() {
     count: grouped[category.key]?.length || 0,
   }));
   const merchProducts = products.map(product => ({
-    ...product,
+    ...getCommerceCardProduct(product),
     stushCategory: stushCategoryKey(product),
     stushCategories: stushCategoryKeys(product),
   }));

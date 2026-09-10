@@ -8,8 +8,8 @@ export default function ExperienceLayer(){
   const cursor=document.querySelector('.stush-cursor');
   root.classList.add('stush-motion-ready');
 
-  // Reveal individual content elements, not entire long product sections.
-  const targets=[...document.querySelectorAll('.curtain,.product-card,.campaign-card,.lookbook-card,figure,[data-stush-reveal]')];
+  // Reveal individual content elements only. Never hide full commerce sections.
+  const targets=[...document.querySelectorAll('.stush-product-card,.campaign-card,.lookbook-card,.journal-card,figure,[data-stush-reveal]')];
   targets.forEach((el,i)=>{el.classList.add('stush-reveal');el.style.setProperty('--stush-delay',`${(i%5)*45}ms`)});
   const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('is-visible');io.unobserve(e.target)}}),{threshold:0,rootMargin:'0px 0px -4% 0px'});
   targets.forEach(el=>io.observe(el));
@@ -20,13 +20,13 @@ export default function ExperienceLayer(){
    root.style.setProperty('--stush-y',`${e.clientY}px`);
    if(!cursor)return;
    const action=e.target.closest?.('a,button,[role="button"],[data-cursor]');
-   const viewTarget=e.target.closest?.('[data-cursor="view"],.curtain,.product-card,.campaign-card,.lookbook-card');
+   const viewTarget=e.target.closest?.('[data-cursor="view"],.stush-product-card,.campaign-card,.lookbook-card,.journal-card');
    cursor.classList.toggle('is-interactive',Boolean(action));
    cursor.classList.toggle('is-view',Boolean(viewTarget));
    cursor.textContent=viewTarget?'VIEW':'';
   };
   const onPointerLeave=()=>{cursor?.classList.remove('is-interactive','is-view')};
-  const onClick=e=>{const a=e.target.closest?.('a');if(!a||a.target==='_blank'||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;const u=new URL(a.href,location.href);if(u.origin!==location.origin||u.hash||u.pathname===location.pathname)return;e.preventDefault();root.classList.add('stush-leaving');setTimeout(()=>location.href=u.href,260)};
+  const onClick=e=>{const a=e.target.closest?.('a');if(!a||a.target==='_blank'||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;const u=new URL(a.href,location.href);if(u.origin!==location.origin||u.hash||u.pathname===location.pathname)return;e.preventDefault();root.classList.add('stush-leaving');setTimeout(()=>location.href=u.href,220)};
 
   onScroll();
   addEventListener('scroll',onScroll,{passive:true});

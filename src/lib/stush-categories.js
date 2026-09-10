@@ -16,7 +16,8 @@ function haystack(product) {
 
 export function isWomenProduct(product) {
   const text = haystack(product);
-  return /\b(women|woman|womens|women's|female|audience:women|gender:women|line:women|collection:women)\b/.test(text);
+  return /\b(women|woman|womens|women's|female|audience:women|gender:women|line:women|collection:women)\b/.test(text)
+    || /\b(crop|cropped|bodycon|fit:cropped)\b/.test(text);
 }
 
 export function isEssentialsProduct(product) {

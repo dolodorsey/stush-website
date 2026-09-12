@@ -5,6 +5,7 @@ import ProductInteractive from '@/components/ProductInteractive';
 export const dynamic = 'force-dynamic';
 
 const STORE_URL = "https://bodgeaworldwide.myshopify.com";
+const SITE_URL = 'https://stushusa.com';
 
 function productMetadataTitle(title = '') {
   const cleaned = title.replace(/^stush\s*[—–-]\s*/i, '').trim();
@@ -17,9 +18,30 @@ export async function generateMetadata({ params }) {
     title: 'STUSH — Dressed for the Room',
     description: 'Shop the current STUSH collection.',
   };
+
+  const title = productMetadataTitle(product.title);
+  const description = plainDescription(product.body_html, 160);
+  const url = `${SITE_URL}/products/${product.handle}`;
+  const image = product.image?.src || product.images?.[0]?.src;
+
   return {
-    title: productMetadataTitle(product.title),
-    description: plainDescription(product.body_html, 160),
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: 'STUSH',
+      type: 'website',
+      ...(image ? { images: [{ url: image, alt: product.title }] } : {}),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      ...(image ? { images: [image] } : {}),
+    },
   };
 }
 

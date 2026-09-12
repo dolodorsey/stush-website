@@ -6,14 +6,19 @@ export const dynamic = 'force-dynamic';
 
 const STORE_URL = "https://bodgeaworldwide.myshopify.com";
 
+function productMetadataTitle(title = '') {
+  const cleaned = title.replace(/^stush\s*[—–-]\s*/i, '').trim();
+  return cleaned ? `${cleaned} — STUSH` : 'STUSH — Dressed for the Room';
+}
+
 export async function generateMetadata({ params }) {
   const product = await getProductByHandle(params.handle);
   if (!product) return {
-    title: 'STUSH — The Empire',
+    title: 'STUSH — Dressed for the Room',
     description: 'Shop the current STUSH collection.',
   };
   return {
-    title: `${product.title} — STUSH`,
+    title: productMetadataTitle(product.title),
     description: plainDescription(product.body_html, 160),
   };
 }

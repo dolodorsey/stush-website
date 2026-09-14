@@ -12,7 +12,7 @@ permissions:
 jobs:
   build-and-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -64,3 +64,41 @@ jobs:
           checkout_status="$(curl --silent --show-error --max-time 5 --output /dev/null --write-out '%{http_code}' \
             -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/checkout)"
           test "$checkout_status" = "400"
+
+      - name: Install visual QA browser
+        shell: bash
+        run: |
+          npm install --no-save --no-package-lock playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Screenshot and verify visual contracts
+        shell: bash
+        run: |
+          npm run start > /tmp/stush-visual.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" || true' EXIT
+
+          ready=false
+          for attempt in {1..30}; do
+            if curl --silent --fail --max-time 5 --output /dev/null http://127.0.0.1:3000/; then
+              ready=true
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$ready" != "true" ]; then
+            cat /tmp/stush-visual.log
+            exit 1
+          fi
+
+          VISUAL_BASE_URL=http://127.0.0.1:3000 node tests/visual-qa.mjs
+
+      - name: Upload STUSH visual QA screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stush-visual-qa-${{ github.sha }}
+          path: artifacts/visual-qa
+          if-no-files-found: error
+          retention-days: 30

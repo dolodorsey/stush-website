@@ -7,6 +7,7 @@ import './stush-pages-v2.css';
 import './production-refinement.css';
 import './stush-visual-standard.css';
 import './category-editorial.css';
+import './qa-fixes.css';
 import { Bodoni_Moda, DM_Mono, DM_Sans } from 'next/font/google';
 import MobileMenu from '@/components/MobileMenu';
 import NavScroll from '@/components/NavScroll';

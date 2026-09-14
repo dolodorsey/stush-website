@@ -1,0 +1,17 @@
+/* STUSH FINAL VISUAL QA CORRECTIONS
+   This file is intentionally imported after category-editorial.css.
+   Keep fixes here surgical and verification-driven. */
+
+/* TOPS — the secondary editorial piece must remain visibly rendered.
+   The previous category rule used display:none, which caused Playwright
+   visual QA to correctly flag a loaded product image at 0×0 dimensions. */
+.edit-page--tops .edit-stage__piece--2 {
+  display: block;
+  width: 24%;
+  height: 26%;
+  left: 4%;
+  top: 5%;
+  right: auto;
+  bottom: auto;
+  background: #d7d0c6;
+}

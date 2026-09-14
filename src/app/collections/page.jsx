@@ -30,11 +30,11 @@ export default async function CollectionsPage() {
         <span className="page-head__crumb"><a href="/">Stush</a> / Collections</span>
         <span className="page-head__season">FALL / WINTER 26</span>
         <h1 className="page-head__title">Shop by <em>Wardrobe</em></h1>
-        <p className="collection-intro">A clear collection architecture: essentials, women, outerwear, sweats, jerseys, tees, bottoms and finishing pieces.</p>
+        <p className="collection-intro">Eight distinct rooms inside one house: foundation, women, outerwear, fleece, sport, first layers, bottoms and finishing pieces.</p>
       </header>
 
       <section className="category-landing category-landing--v2">
-        <a className="category-landing__hero" href="/collections/stush#all" data-cursor="view">
+        <a className="category-landing__hero" href="/shop" data-cursor="view">
           {heroImage && <img src={heroImage} alt="The STUSH collection" />}
           <span className="category-landing__veil" />
           <span className="category-landing__copy">
@@ -46,7 +46,7 @@ export default async function CollectionsPage() {
 
         <div className="category-landing__grid category-landing__grid--v2">
           {categories.map(category => (
-            <a key={category.key} href={`/collections/stush#${category.key}`} className={`category-tile ${category.products.length ? '' : 'category-tile--empty'}`} data-cursor="view">
+            <a key={category.key} href={`/collections/${category.key}`} className={`category-tile ${category.products.length ? '' : 'category-tile--empty'}`} data-cursor="view">
               {category.image && <img src={category.image} alt={category.label} loading="lazy" />}
               <span className="category-landing__veil" />
               <span className="category-tile__copy">

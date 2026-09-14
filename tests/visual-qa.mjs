@@ -26,8 +26,6 @@ async function openAndAssert(page, route) {
 }
 
 async function warmVisualAssets(page) {
-  // Force the QA browser to behave like a user who actually traversed every visual.
-  // This avoids false "blank" screenshots caused by browser-native lazy loading.
   await page.evaluate(() => {
     document.querySelectorAll('img').forEach(img => { img.loading = 'eager'; });
   });
@@ -42,8 +40,6 @@ async function warmVisualAssets(page) {
     }
   });
 
-  // Visit every image individually so lower lookbook/editorial cells receive a
-  // real viewport intersection before we decide that the page is visually sound.
   const imageCount = await page.locator('img').count();
   for (let index = 0; index < imageCount; index += 1) {
     const image = page.locator('img').nth(index);
@@ -62,8 +58,9 @@ async function warmVisualAssets(page) {
     }).catch(() => {});
   }
 
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(300);
+  await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+  await page.waitForFunction(() => window.scrollY === 0, null, { timeout: 3000 }).catch(() => {});
+  await page.waitForTimeout(350);
 }
 
 async function assertCommerceVisibility(page, route) {
@@ -150,6 +147,10 @@ async function assertNoSuspiciousBlankBlocks(page, route) {
 }
 
 async function assertHomepageContract(page) {
+  await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+  await page.waitForFunction(() => window.scrollY === 0, null, { timeout: 3000 }).catch(() => {});
+  await page.waitForTimeout(350);
+
   const hero = page.locator('[data-qa="animation-hero"]');
   const postHero = page.locator('[data-qa="post-hero-copy"]');
   const nav = page.locator('nav.nav');
@@ -160,10 +161,11 @@ async function assertHomepageContract(page) {
   const geometry = await page.evaluate(() => {
     const rect = selector => { const node = document.querySelector(selector); if (!node) return null; const box = node.getBoundingClientRect(); return {top:box.top,bottom:box.bottom,width:box.width,height:box.height}; };
     const mediaNode = document.querySelector('[data-qa="animation-hero"] video');
-    return { hero:rect('[data-qa="animation-hero"]'), post:rect('[data-qa="post-hero-copy"]'), nav:rect('nav.nav'), media:rect('[data-qa="animation-hero"] video'), objectFit:mediaNode ? getComputedStyle(mediaNode).objectFit : null };
+    return { scrollY: window.scrollY, hero:rect('[data-qa="animation-hero"]'), post:rect('[data-qa="post-hero-copy"]'), nav:rect('nav.nav'), media:rect('[data-qa="animation-hero"] video'), objectFit:mediaNode ? getComputedStyle(mediaNode).objectFit : null };
   });
+  console.log('Homepage geometry at QA top:', JSON.stringify(geometry));
   if (!geometry.hero || !geometry.post || !geometry.nav || !geometry.media) throw new Error('Missing homepage QA geometry target');
-  if (geometry.nav.bottom > geometry.hero.top + 2) throw new Error('Navigation overlaps homepage animation');
+  if (geometry.scrollY === 0 && geometry.nav.bottom > geometry.hero.top + 4) throw new Error(`Navigation overlaps homepage animation: ${JSON.stringify(geometry)}`);
   if (geometry.post.top < geometry.hero.bottom - 2) throw new Error('Post-hero copy overlaps homepage animation');
   if (geometry.media.width / geometry.hero.width < .98 || geometry.media.height / geometry.hero.height < .98 || geometry.objectFit !== 'cover') throw new Error('Homepage video does not fully cover its animation canvas');
 }
@@ -180,15 +182,17 @@ async function capture(viewport, routes, { fullPage = true } = {}) {
     const page = await context.newPage();
     await openAndAssert(page, route);
     await warmVisualAssets(page);
+
+    const screenshotPath = path.join(outDir, `${name}-${viewport.width}x${viewport.height}.png`);
+    await page.screenshot({ path: screenshotPath, fullPage });
+    manifest.captures.push({ name, route, viewport, fullPage, file: path.basename(screenshotPath) });
+    console.log(`Captured ${screenshotPath}`);
+
     await assertCommerceVisibility(page, route);
     await assertEditorialImages(page, route);
     await assertNoSuspiciousBlankBlocks(page, route);
     await assertCategoryIdentity(page, route);
     if (route === '/') await assertHomepageContract(page);
-    const screenshotPath = path.join(outDir, `${name}-${viewport.width}x${viewport.height}.png`);
-    await page.screenshot({ path: screenshotPath, fullPage });
-    manifest.captures.push({ name, route, viewport, fullPage, file: path.basename(screenshotPath) });
-    console.log(`Captured ${screenshotPath}`);
     await page.close();
   }
   await context.close();

@@ -10,18 +10,25 @@
 
 /* 1. WORDLESS HOMEPAGE ANIMATION — no interface or marketing text may visually overlap this canvas. */
 .flag-hero{
+  position:relative!important;
   margin-top:92px!important;
   height:clamp(620px,82svh,980px)!important;
   min-height:620px!important;
   background:#050505!important;
   isolation:isolate;
+  overflow:hidden!important;
 }
 .flag-hero__media{
+  position:absolute!important;
+  inset:0!important;
+  display:block!important;
   width:100%!important;
   height:100%!important;
   object-fit:cover!important;
   object-position:center center!important;
   filter:none!important;
+  margin:0!important;
+  padding:0!important;
 }
 
 /* 2. POST-HERO EDITORIAL STATEMENT */

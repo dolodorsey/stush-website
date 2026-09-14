@@ -70,7 +70,7 @@ export default async function HomePage() {
             const image = getCommerceLeadImage(product);
             const src = image?.src || image?.url || null;
             return (
-              <a href={`/collections/stush#${chapter.key}`} className={`flag-campaign flag-campaign--${index + 1}`} key={chapter.key}>
+              <a href={`/collections/${chapter.key}`} className={`flag-campaign flag-campaign--${index + 1}`} key={chapter.key}>
                 {src && (
                   <Image
                     src={src}
@@ -91,7 +91,7 @@ export default async function HomePage() {
         <header><span className="flag-kicker">THE WARDROBE</span><h2>SHOP BY<br/>CATEGORY.</h2></header>
         <div className="flag-index__list">
           {shopChapters.map((section, index) => (
-            <a key={section.key} href={`/collections/stush#${section.key}`}>
+            <a key={section.key} href={`/collections/${section.key}`}>
               <span>{String(index + 1).padStart(2, '0')}</span>
               <strong>{section.label}</strong>
               <em>{section.products.length ? pieceCount(section.products.length) : 'FALL EDIT INCOMING'}</em>

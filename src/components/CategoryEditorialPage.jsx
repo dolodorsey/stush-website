@@ -3,6 +3,7 @@ import { getProducts } from '@/lib/shopify';
 import CurtainCard from '@/components/CurtainCard';
 import { groupStushProducts, sortStushProducts, STUSH_CATEGORIES } from '@/lib/stush-categories';
 import { getCommerceCardProduct, getCommerceLeadImage } from '@/lib/stush-merchandising';
+import { STUSH_CATEGORY_CAMPAIGN } from '@/lib/stush-campaign-assets';
 
 const EDITS = {
   essentials: {
@@ -11,6 +12,7 @@ const EDITS = {
     intro: 'The pieces that make the rest of the wardrobe work: weight, proportion and repeat wear without disappearing into basics.',
     code: ['WEIGHT', 'LAYER', 'REPEAT'],
     layout: 'foundation',
+    campaignLine: 'THE PIECES THAT MAKE THE REST OF THE ROOM WORK.',
   },
   women: {
     kicker: 'WOMEN / FALL 26',
@@ -18,6 +20,7 @@ const EDITS = {
     intro: 'Cropped proportion, strong lines and pieces built to change the room before the conversation starts.',
     code: ['PROPORTION', 'MOVEMENT', 'CONTRAST'],
     layout: 'portrait',
+    campaignLine: 'PRESENCE BEFORE INTRODUCTION.',
   },
   outerwear: {
     kicker: 'OUTERWEAR / FALL 26',
@@ -25,6 +28,7 @@ const EDITS = {
     intro: 'Structure first. Jackets and layers judged by silhouette, hardware, weight and what they do to everything underneath.',
     code: ['STRUCTURE', 'HARDWARE', 'WEATHER'],
     layout: 'monolith',
+    campaignLine: 'THE FIRST THING THE ROOM SEES.',
   },
   hoodies: {
     kicker: 'FLEECE STUDY / FALL 26',
@@ -32,6 +36,7 @@ const EDITS = {
     intro: 'Wash, hand feel and volume turn familiar fleece into the part of the look that carries the most attitude.',
     code: ['WASH', 'WEIGHT', 'LAYER'],
     layout: 'washed',
+    campaignLine: 'FAMILIAR SHAPE. HEAVIER PRESENCE.',
   },
   jerseys: {
     kicker: 'SPORT CODE / FALL 26',
@@ -39,6 +44,7 @@ const EDITS = {
     intro: 'Sport language without costume: collar, number, contrast and the confidence of a uniform moved into nightlife.',
     code: ['NUMBER', 'COLLAR', 'SIGNAL'],
     layout: 'scoreboard',
+    campaignLine: 'SPORT LANGUAGE MOVED INTO THE CITY.',
   },
   tops: {
     kicker: 'CORE LAYERS / FALL 26',
@@ -46,6 +52,7 @@ const EDITS = {
     intro: 'The graphic, crop and boxy shapes that set the proportion before the rest of the fit gets involved.',
     code: ['GRAPHIC', 'PROPORTION', 'GROUND'],
     layout: 'paper',
+    campaignLine: 'GRAPHICS THAT DO MORE THAN FILL A CHEST.',
   },
   bottoms: {
     kicker: 'BOTTOMS / FALL 26',
@@ -53,6 +60,7 @@ const EDITS = {
     intro: 'Width, drape and movement. The lower half is treated as architecture instead of an afterthought.',
     code: ['DRAPE', 'WIDTH', 'MOVEMENT'],
     layout: 'runway',
+    campaignLine: 'PROPORTION STARTS AT THE FLOOR.',
   },
   accessories: {
     kicker: 'FINISHING PIECES / FALL 26',
@@ -60,6 +68,7 @@ const EDITS = {
     intro: 'Small objects with enough identity to finish the whole silhouette. Scale matters more when the object is smaller.',
     code: ['DETAIL', 'SCALE', 'FINISH'],
     layout: 'macro',
+    campaignLine: 'THE SMALLEST OBJECT CAN HOLD THE WHOLE LOOK.',
   },
 };
 
@@ -98,6 +107,7 @@ export default async function CategoryEditorialPage({ categoryKey }) {
   const products = rawProducts.map(getCommerceCardProduct).filter(product => product.coverImage);
   const heroProducts = rawProducts.map(product => ({ product, media: media(product) })).filter(item => item.media).slice(0, 3);
   const adjacent = STUSH_CATEGORIES.filter(item => item.key !== categoryKey && (grouped[item.key] || []).length > 0).slice(0, 3);
+  const campaign = STUSH_CATEGORY_CAMPAIGN[categoryKey];
 
   return (
     <div className={`edit-page edit-page--${categoryKey} edit-page--layout-${config.layout}`} data-qa="category-edit" data-category={categoryKey}>
@@ -130,6 +140,18 @@ export default async function CategoryEditorialPage({ categoryKey }) {
         {config.code.map((item, index) => <div key={item}><small>0{index + 1}</small><strong>{item}</strong></div>)}
         <div className="edit-code__count"><small>LIVE EDIT</small><strong>{products.length} {products.length === 1 ? 'PIECE' : 'PIECES'}</strong></div>
       </section>
+
+      {campaign && (
+        <section className="edit-campaign-interlude stush-campaign-art" data-qa="category-campaign">
+          <Image src={campaign.src} alt={campaign.alt} fill sizes="100vw" />
+          <span className="edit-campaign-interlude__veil" />
+          <div className="edit-campaign-interlude__copy">
+            <span>{config.kicker}</span>
+            <strong>{config.campaignLine}</strong>
+            <a href="#pieces">SHOP THE EDIT ↘</a>
+          </div>
+        </section>
+      )}
 
       <section className="edit-product-floor" id="pieces" data-product-count={products.length}>
         <header className="edit-product-floor__head">

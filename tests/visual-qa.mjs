@@ -65,15 +65,27 @@ async function assertHomepageContract(page) {
   }
 
   const geometry = await page.evaluate(() => {
-    const hero = document.querySelector('[data-qa="animation-hero"]')?.getBoundingClientRect();
-    const post = document.querySelector('[data-qa="post-hero-copy"]')?.getBoundingClientRect();
-    const nav = document.querySelector('nav.nav')?.getBoundingClientRect();
-    const announce = document.querySelector('.announce')?.getBoundingClientRect();
-    const media = document.querySelector('[data-qa="animation-hero"] video')?.getBoundingClientRect();
-    return { hero, post, nav, announce, media };
+    const rect = (selector) => {
+      const node = document.querySelector(selector);
+      if (!node) return null;
+      const box = node.getBoundingClientRect();
+      return { top: box.top, right: box.right, bottom: box.bottom, left: box.left, width: box.width, height: box.height };
+    };
+    const mediaNode = document.querySelector('[data-qa="animation-hero"] video');
+    const mediaStyle = mediaNode ? getComputedStyle(mediaNode) : null;
+    return {
+      hero: rect('[data-qa="animation-hero"]'),
+      post: rect('[data-qa="post-hero-copy"]'),
+      nav: rect('nav.nav'),
+      announce: rect('.announce'),
+      media: rect('[data-qa="animation-hero"] video'),
+      mediaStyle: mediaStyle ? { objectFit: mediaStyle.objectFit, position: mediaStyle.position } : null,
+    };
   });
 
-  if (!geometry.hero || !geometry.post || !geometry.nav || !geometry.media) {
+  console.log('Homepage visual geometry:', JSON.stringify(geometry));
+
+  if (!geometry.hero || !geometry.post || !geometry.nav || !geometry.media || !geometry.mediaStyle) {
     throw new Error('Missing homepage QA geometry target');
   }
   if (geometry.nav.bottom > geometry.hero.top + 2) {
@@ -82,8 +94,11 @@ async function assertHomepageContract(page) {
   if (geometry.post.top < geometry.hero.bottom - 2) {
     throw new Error(`Post-hero copy overlaps animation: post top ${geometry.post.top}, hero bottom ${geometry.hero.bottom}`);
   }
-  if (geometry.media.width < geometry.hero.width - 2 || geometry.media.height < geometry.hero.height - 2) {
-    throw new Error('Homepage video does not fully cover the animation canvas');
+
+  const widthCoverage = geometry.media.width / geometry.hero.width;
+  const heightCoverage = geometry.media.height / geometry.hero.height;
+  if (widthCoverage < 0.98 || heightCoverage < 0.98 || geometry.mediaStyle.objectFit !== 'cover') {
+    throw new Error(`Homepage video coverage failed: width=${widthCoverage.toFixed(3)}, height=${heightCoverage.toFixed(3)}, object-fit=${geometry.mediaStyle.objectFit}`);
   }
 }
 
@@ -92,11 +107,12 @@ async function capture(viewport, routes) {
   for (const [name, route] of routes) {
     const page = await context.newPage();
     await openAndAssert(page, route);
+
+    const screenshotPath = path.join(outDir, `${name}-${viewport.width}x${viewport.height}.png`);
+    await page.screenshot({ path: screenshotPath, fullPage: true });
+    console.log(`Captured ${screenshotPath}`);
+
     if (route === '/') await assertHomepageContract(page);
-    await page.screenshot({
-      path: path.join(outDir, `${name}-${viewport.width}x${viewport.height}.png`),
-      fullPage: true,
-    });
     await page.close();
   }
   await context.close();

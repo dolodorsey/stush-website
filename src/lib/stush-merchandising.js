@@ -59,11 +59,16 @@ export function getCommerceLeadImage(product) {
   });
   if (explicitFront) return explicitFront;
 
-  // Shopify's featured/first image is the safest fallback for catalog presentation.
   const first = images[0];
   if (first && !isRejected(first, product)) return first;
 
-  return images.find(image => !isRejected(image, product)) || null;
+  const approved = images.find(image => !isRejected(image, product));
+  if (approved) return approved;
+
+  // Last-resort commerce rule: never render a blank sellable card when Shopify
+  // has actual media. We would rather show the real product's own first usable
+  // image than replace it with a placeholder, generated garment, or empty panel.
+  return images.find(image => imageSrc(image)) || null;
 }
 
 export function getCommerceGalleryImages(product) {
@@ -73,8 +78,6 @@ export function getCommerceGalleryImages(product) {
   const lead = getCommerceLeadImage(product);
   const leadSrc = imageSrc(lead);
 
-  // Secondary storefront media must identify itself as product/detail media.
-  // Unlabelled vendor mockups are intentionally not promoted into the STUSH storefront.
   const approvedSecondary = images.filter((image, index) => {
     if (imageSrc(image) === leadSrc) return false;
     if (isRejected(image, product)) return false;
@@ -97,8 +100,6 @@ export function getCommerceHoverImage(product) {
   return gallery[1] || null;
 }
 
-// Keep collection-browser client payloads lean. Product descriptions, every variant,
-// and full media galleries stay on the server; cards only receive what they render.
 export function getCommerceCardProduct(product) {
   const variant = product?.variants?.find(item => item.available !== false) || product?.variants?.[0];
   return {

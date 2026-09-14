@@ -1,6 +1,7 @@
 import { getCollections, getCollectionProducts } from '@/lib/shopify';
 import { STUSH_CATEGORIES, groupStushProducts, sortStushProducts } from '@/lib/stush-categories';
 import { getCommerceLeadImage } from '@/lib/stush-merchandising';
+import { STUSH_CATEGORY_CAMPAIGN, STUSH_HOUSE_WORLD } from '@/lib/stush-campaign-assets';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Collections — STUSH' };
@@ -20,9 +21,9 @@ export default async function CollectionsPage() {
   const categories = STUSH_CATEGORIES.map(category => ({
     ...category,
     products: grouped[category.key] || [],
-    image: leadSrc(grouped[category.key]?.[0]),
+    campaign: STUSH_CATEGORY_CAMPAIGN[category.key],
+    fallbackImage: leadSrc(grouped[category.key]?.[0]),
   }));
-  const heroImage = leadSrc(products?.[0]);
 
   return (
     <>
@@ -33,29 +34,33 @@ export default async function CollectionsPage() {
         <p className="collection-intro">Eight distinct rooms inside one house: foundation, women, outerwear, fleece, sport, first layers, bottoms and finishing pieces.</p>
       </header>
 
-      <section className="category-landing category-landing--v2">
-        <a className="category-landing__hero" href="/shop" data-cursor="view">
-          {heroImage && <img src={heroImage} alt="The STUSH collection" />}
+      <section className="category-landing category-landing--v2 stush-campaign-art">
+        <a className="category-landing__hero category-landing__hero--campaign" href="/shop" data-cursor="view">
+          <img src={STUSH_HOUSE_WORLD.crystal.src} alt={STUSH_HOUSE_WORLD.crystal.alt} />
           <span className="category-landing__veil" />
           <span className="category-landing__copy">
-            <small>Complete fall collection</small>
+            <small>THE HOUSE / FALL 26</small>
             <strong>The <em>Current Edit</em></strong>
-            <span>{products.length} active pieces</span>
+            <span>{products.length} active pieces · enter the wardrobe</span>
           </span>
         </a>
 
         <div className="category-landing__grid category-landing__grid--v2">
-          {categories.map(category => (
-            <a key={category.key} href={`/collections/${category.key}`} className={`category-tile ${category.products.length ? '' : 'category-tile--empty'}`} data-cursor="view">
-              {category.image && <img src={category.image} alt={category.label} loading="lazy" />}
-              <span className="category-landing__veil" />
-              <span className="category-tile__copy">
-                <small>{category.eyebrow}</small>
-                <strong>{category.label}</strong>
-                <span>{category.products.length ? `${category.products.length} pieces` : 'Fall edit incoming'}</span>
-              </span>
-            </a>
-          ))}
+          {categories.map(category => {
+            const src = category.campaign?.src || category.fallbackImage;
+            const alt = category.campaign?.alt || category.label;
+            return (
+              <a key={category.key} href={`/collections/${category.key}`} className={`category-tile ${category.products.length ? '' : 'category-tile--empty'}`} data-cursor="view">
+                {src && <img src={src} alt={alt} loading="lazy" />}
+                <span className="category-landing__veil" />
+                <span className="category-tile__copy">
+                  <small>{category.eyebrow}</small>
+                  <strong>{category.label}</strong>
+                  <span>{category.products.length ? `${category.products.length} pieces` : 'Fall edit incoming'}</span>
+                </span>
+              </a>
+            );
+          })}
         </div>
       </section>
     </>

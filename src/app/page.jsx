@@ -26,7 +26,7 @@ export default async function HomePage() {
 
   return (
     <div className="flagship">
-      <section className="flag-hero">
+      <section className="flag-hero" data-qa="animation-hero" aria-label="STUSH campaign film">
         <video
           className="flag-hero__media"
           autoPlay
@@ -36,39 +36,34 @@ export default async function HomePage() {
           preload="metadata"
           poster="/campaigns/stush-real-product.png"
           src="/STUSH_VID.mp4"
+          aria-hidden="true"
         />
-        <div className="flag-hero__veil" />
-        <div className="flag-hero__content">
+      </section>
+
+      <section className="flag-intro" data-qa="post-hero-copy">
+        <div className="flag-intro__headline">
           <span className="flag-kicker">FALL / WINTER 26 · ATLANTA</span>
-          <h1><span>DRESSED</span><span>FOR THE</span><em>ROOM.</em></h1>
-          <div className="flag-hero__bottom">
-            <p>STUSH is built around presence: strong silhouettes, limited edits and clothes that hold a room.</p>
-            <div><a href="/shop" className="flag-btn flag-btn--light">SHOP THE FALL EDIT</a><a href="/lookbook" className="flag-link">VIEW LOOKBOOK ↗</a></div>
+          <h1><span>DRESSED FOR</span><em>THE ROOM.</em></h1>
+        </div>
+        <div className="flag-intro__aside">
+          <p>STUSH is built around presence: strong silhouettes, limited edits and clothes that hold a room.</p>
+          <div className="flag-intro__actions">
+            <a href="/shop" className="flag-btn flag-btn--dark">SHOP THE FALL EDIT</a>
+            <a href="/lookbook" className="flag-link">VIEW LOOKBOOK ↗</a>
           </div>
         </div>
       </section>
 
       <section className="flag-product-edit flag-product-edit--first">
-        <div className="flag-section-head"><div><span className="flag-kicker">SHOP NOW</span><h2>THE CURRENT<br/>EDIT.</h2></div><a href="/shop" className="flag-link">VIEW ALL PIECES ↗</a></div>
+        <div className="flag-section-head">
+          <div><span className="flag-kicker">SHOP NOW</span><h2>THE CURRENT<br/>EDIT.</h2></div>
+          <a href="/shop" className="flag-link">VIEW ALL PIECES ↗</a>
+        </div>
         <div className="flag-product-grid">{featured.map((product, index) => <CurtainCard key={product.id} product={product} priority={index < 4} />)}</div>
       </section>
 
-      <section className="flag-index">
-        <header><span className="flag-kicker">THE WARDROBE</span><h2>SHOP BY<br/>CATEGORY.</h2></header>
-        <div className="flag-index__list">
-          {shopChapters.map((section, index) => (
-            <a key={section.key} href={`/collections/stush#${section.key}`}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <strong>{section.label}</strong>
-              <em>{section.products.length ? pieceCount(section.products.length) : 'FALL EDIT INCOMING'}</em>
-              <i>↗</i>
-            </a>
-          ))}
-        </div>
-      </section>
-
       <section className="flag-campaigns">
-        <header><span className="flag-kicker">FALL 26 / WARDROBE STUDIES</span><h2>THE CLOTHES<br/><em>COME FIRST.</em></h2></header>
+        <header><span className="flag-kicker">THE WARDROBE / FALL 26</span><h2>THE CLOTHES<br/><em>COME FIRST.</em></h2></header>
         <div className="flag-campaigns__grid">
           {visualChapters.map((chapter, index) => {
             const product = chapter.products[0];
@@ -92,9 +87,26 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <section className="flag-index">
+        <header><span className="flag-kicker">THE WARDROBE</span><h2>SHOP BY<br/>CATEGORY.</h2></header>
+        <div className="flag-index__list">
+          {shopChapters.map((section, index) => (
+            <a key={section.key} href={`/collections/stush#${section.key}`}>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <strong>{section.label}</strong>
+              <em>{section.products.length ? pieceCount(section.products.length) : 'FALL EDIT INCOMING'}</em>
+              <i>↗</i>
+            </a>
+          ))}
+        </div>
+      </section>
+
       <section className="flag-thesis">
         <span className="flag-kicker">STUSH / HOUSE CODE 001</span>
-        <div className="flag-thesis__grid"><h2>NOT MADE<br/>TO BLEND IN.</h2><div><p>Atlanta confidence translated into a focused wardrobe: better proportion, stronger silhouettes and fewer pieces with more purpose.</p><a href="/journal" className="flag-link">READ THE HOUSE NOTES ↗</a></div></div>
+        <div className="flag-thesis__grid">
+          <h2>NOT MADE<br/>TO BLEND IN.</h2>
+          <div><p>Atlanta confidence translated into a focused wardrobe: better proportion, stronger silhouettes and fewer pieces with more purpose.</p><a href="/journal" className="flag-link">READ THE HOUSE NOTES ↗</a></div>
+        </div>
       </section>
 
       <section className="flag-atelier">

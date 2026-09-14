@@ -40,12 +40,12 @@ async function warmVisualAssets(page) {
     const step = Math.max(420, Math.floor(window.innerHeight * 0.75));
     for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
       window.scrollTo(0, y);
-      await new Promise(resolve => setTimeout(resolve, 90));
+      await new Promise(resolve => setTimeout(resolve, 110));
     }
     window.scrollTo(0, 0);
   });
 
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(350);
   await page.evaluate(async () => {
     const pending = [...document.images]
       .filter(img => !img.complete)
@@ -58,7 +58,45 @@ async function warmVisualAssets(page) {
       new Promise(resolve => setTimeout(resolve, 5000)),
     ]);
   });
-  await page.waitForTimeout(250);
+  await page.waitForTimeout(300);
+}
+
+async function assertCommerceVisibility(page, route) {
+  const commerce = await page.evaluate(() => {
+    const cards = [...document.querySelectorAll('.stush-product-card')];
+    const invisible = cards
+      .map((card, index) => {
+        const style = getComputedStyle(card);
+        const rect = card.getBoundingClientRect();
+        const image = card.querySelector('img');
+        const imageStyle = image ? getComputedStyle(image) : null;
+        return {
+          index,
+          opacity: Number.parseFloat(style.opacity || '1'),
+          visibility: style.visibility,
+          display: style.display,
+          width: rect.width,
+          height: rect.height,
+          imageOpacity: imageStyle ? Number.parseFloat(imageStyle.opacity || '1') : null,
+          hasImage: Boolean(image),
+        };
+      })
+      .filter(item => item.opacity < 0.95 || item.visibility === 'hidden' || item.display === 'none' || item.width < 20 || item.height < 20 || !item.hasImage);
+
+    const summary = document.querySelector('.collection-browser__summary strong');
+    return {
+      count: cards.length,
+      invisible,
+      expectedCount: summary ? Number.parseInt(summary.textContent || '0', 10) : null,
+    };
+  });
+
+  if (commerce.invisible.length) {
+    throw new Error(`${route} has ${commerce.invisible.length} hidden/broken commerce card(s): ${JSON.stringify(commerce.invisible.slice(0, 5))}`);
+  }
+  if (route === '/shop' && commerce.expectedCount !== null && commerce.count !== commerce.expectedCount) {
+    throw new Error(`/shop renders ${commerce.count} product cards but the live summary says ${commerce.expectedCount}`);
+  }
 }
 
 async function assertHomepageContract(page) {
@@ -147,12 +185,12 @@ async function capture(viewport, routes) {
     const page = await context.newPage();
     await openAndAssert(page, route);
     await warmVisualAssets(page);
+    await assertCommerceVisibility(page, route);
+    if (route === '/') await assertHomepageContract(page);
 
     const screenshotPath = path.join(outDir, `${name}-${viewport.width}x${viewport.height}.png`);
     await page.screenshot({ path: screenshotPath, fullPage: true });
     console.log(`Captured ${screenshotPath}`);
-
-    if (route === '/') await assertHomepageContract(page);
     await page.close();
   }
   await context.close();

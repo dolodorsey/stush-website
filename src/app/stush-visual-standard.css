@@ -8,8 +8,9 @@
   --stush-gold:#b78b38;
 }
 
-/* 1. WORDLESS HOMEPAGE ANIMATION — no marketing UI is permitted inside this canvas. */
+/* 1. WORDLESS HOMEPAGE ANIMATION — no interface or marketing text may visually overlap this canvas. */
 .flag-hero{
+  margin-top:92px!important;
   height:clamp(620px,82svh,980px)!important;
   min-height:620px!important;
   background:#050505!important;

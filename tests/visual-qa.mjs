@@ -35,6 +35,32 @@ async function openAndAssert(page, route) {
   }
 }
 
+async function warmVisualAssets(page) {
+  await page.evaluate(async () => {
+    const step = Math.max(420, Math.floor(window.innerHeight * 0.75));
+    for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
+      window.scrollTo(0, y);
+      await new Promise(resolve => setTimeout(resolve, 90));
+    }
+    window.scrollTo(0, 0);
+  });
+
+  await page.waitForTimeout(300);
+  await page.evaluate(async () => {
+    const pending = [...document.images]
+      .filter(img => !img.complete)
+      .map(img => new Promise(resolve => {
+        img.addEventListener('load', resolve, { once: true });
+        img.addEventListener('error', resolve, { once: true });
+      }));
+    await Promise.race([
+      Promise.all(pending),
+      new Promise(resolve => setTimeout(resolve, 5000)),
+    ]);
+  });
+  await page.waitForTimeout(250);
+}
+
 async function assertHomepageContract(page) {
   const hero = page.locator('[data-qa="animation-hero"]');
   const postHero = page.locator('[data-qa="post-hero-copy"]');
@@ -100,6 +126,19 @@ async function assertHomepageContract(page) {
   if (widthCoverage < 0.98 || heightCoverage < 0.98 || geometry.mediaStyle.objectFit !== 'cover') {
     throw new Error(`Homepage video coverage failed: width=${widthCoverage.toFixed(3)}, height=${heightCoverage.toFixed(3)}, object-fit=${geometry.mediaStyle.objectFit}`);
   }
+
+  const merchandising = await page.evaluate(() => ({
+    productCards: document.querySelectorAll('.flag-product-edit--first .stush-product-card').length,
+    productImages: document.querySelectorAll('.flag-product-edit--first .stush-product-card img').length,
+    categoryStories: document.querySelectorAll('.flag-campaigns .flag-campaign').length,
+  }));
+  console.log('Homepage merchandising contract:', JSON.stringify(merchandising));
+  if (merchandising.productCards < 4 || merchandising.productImages < 4) {
+    throw new Error(`Homepage Current Edit is under-merchandised: ${merchandising.productCards} cards / ${merchandising.productImages} images`);
+  }
+  if (merchandising.categoryStories < 4) {
+    throw new Error(`Homepage needs at least four image-led category stories; found ${merchandising.categoryStories}`);
+  }
 }
 
 async function capture(viewport, routes) {
@@ -107,6 +146,7 @@ async function capture(viewport, routes) {
   for (const [name, route] of routes) {
     const page = await context.newPage();
     await openAndAssert(page, route);
+    await warmVisualAssets(page);
 
     const screenshotPath = path.join(outDir, `${name}-${viewport.width}x${viewport.height}.png`);
     await page.screenshot({ path: screenshotPath, fullPage: true });

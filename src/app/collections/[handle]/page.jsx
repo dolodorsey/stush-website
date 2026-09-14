@@ -1,19 +1,28 @@
 import { getCollectionByHandle, getCollectionProducts } from '@/lib/shopify';
 import { notFound } from 'next/navigation';
 import CollectionBrowser from '@/components/CollectionBrowser';
+import CategoryEditorialPage, { categoryMetadata, isEditorialCategory } from '@/components/CategoryEditorialPage';
 import { STUSH_CATEGORIES, groupStushProducts, sortStushProducts, stushCategoryKey, stushCategoryKeys } from '@/lib/stush-categories';
 import { getCommerceCardProduct } from '@/lib/stush-merchandising';
 
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }) {
-  const col = await getCollectionByHandle(params.handle);
+  const { handle } = await params;
+  if (isEditorialCategory(handle)) return categoryMetadata(handle) || {};
+  const col = await getCollectionByHandle(handle);
   if (!col) return {};
   return { title: `${col.title} — STUSH` };
 }
 
 export default async function CollectionPage({ params }) {
-  const col = await getCollectionByHandle(params.handle);
+  const { handle } = await params;
+
+  if (isEditorialCategory(handle)) {
+    return <CategoryEditorialPage categoryKey={handle} />;
+  }
+
+  const col = await getCollectionByHandle(handle);
   if (!col) notFound();
 
   const products = sortStushProducts(await getCollectionProducts(col.id, 250));

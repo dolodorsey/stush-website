@@ -3,6 +3,7 @@ import { getProducts, SHOP_URL } from '@/lib/shopify';
 import CurtainCard from '@/components/CurtainCard';
 import { STUSH_CATEGORIES, groupStushProducts, sortStushProducts } from '@/lib/stush-categories';
 import { getCommerceCardProduct, getCommerceLeadImage } from '@/lib/stush-merchandising';
+import { STUSH_CATEGORY_CAMPAIGN, STUSH_HOUSE_WORLD } from '@/lib/stush-campaign-assets';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +23,9 @@ export default async function HomePage() {
   const shopChapters = STUSH_CATEGORIES
     .map(category => ({ ...category, products: grouped[category.key] || [] }))
     .filter(category => category.products.length || ['essentials', 'women'].includes(category.key));
-  const visualChapters = shopChapters.filter(category => category.products.length).slice(0, 4);
+  const visualChapters = ['women', 'jerseys', 'tops', 'outerwear']
+    .map(key => shopChapters.find(chapter => chapter.key === key))
+    .filter(Boolean);
 
   return (
     <div className="flagship">
@@ -62,24 +65,15 @@ export default async function HomePage() {
         <div className="flag-product-grid">{featured.map((product, index) => <CurtainCard key={product.id} product={product} priority={index < 4} />)}</div>
       </section>
 
-      <section className="flag-campaigns">
-        <header><span className="flag-kicker">THE WARDROBE / FALL 26</span><h2>THE CLOTHES<br/><em>COME FIRST.</em></h2></header>
+      <section className="flag-campaigns stush-campaign-art" data-qa="campaign-chapters">
+        <header><span className="flag-kicker">THE WARDROBE / FALL 26</span><h2>THE CLOTHES<br/><em>COME ALIVE.</em></h2></header>
         <div className="flag-campaigns__grid">
           {visualChapters.map((chapter, index) => {
-            const product = chapter.products[0];
-            const image = getCommerceLeadImage(product);
-            const src = image?.src || image?.url || null;
+            const campaign = STUSH_CATEGORY_CAMPAIGN[chapter.key];
             return (
               <a href={`/collections/${chapter.key}`} className={`flag-campaign flag-campaign--${index + 1}`} key={chapter.key}>
-                {src && (
-                  <Image
-                    src={src}
-                    alt={image?.alt || image?.altText || `${chapter.label} STUSH edit`}
-                    fill
-                    sizes="(max-width: 760px) 100vw, 50vw"
-                    priority={index === 0}
-                  />
-                )}
+                {campaign && <Image src={campaign.src} alt={campaign.alt} fill sizes="(max-width: 760px) 100vw, 50vw" priority={index === 0} />}
+                <span className="campaign-veil" />
                 <div><span>{chapter.eyebrow}</span><strong>{chapter.label}</strong><i>↗</i></div>
               </a>
             );
@@ -101,6 +95,19 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <section className="home-house-world stush-campaign-art" data-qa="house-world">
+        <a className="home-house-world__lead" href="/lookbook">
+          <Image src={STUSH_HOUSE_WORLD.crystal.src} alt={STUSH_HOUSE_WORLD.crystal.alt} fill sizes="(max-width: 860px) 100vw, 68vw" />
+          <span className="campaign-veil" />
+          <div><span className="flag-kicker">STUSH / HOUSE WORLD 001</span><h2>THE WORLD<br/><em>AROUND THE CLOTHES.</em></h2><p>A visual language of black satin, chrome, stone and after-dark rooms.</p><strong>ENTER THE LOOKBOOK ↗</strong></div>
+        </a>
+        <a className="home-house-world__side" href="/journal">
+          <Image src={STUSH_HOUSE_WORLD.chrome.src} alt={STUSH_HOUSE_WORLD.chrome.alt} fill sizes="(max-width: 860px) 100vw, 32vw" />
+          <span className="campaign-veil" />
+          <div><span>HOUSE OBJECTS / 01</span><strong>READ THE HOUSE NOTES ↗</strong></div>
+        </a>
+      </section>
+
       <section className="flag-thesis">
         <span className="flag-kicker">STUSH / HOUSE CODE 001</span>
         <div className="flag-thesis__grid">
@@ -109,10 +116,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="flag-atelier">
-        <Image src="/brand/STUSH_ATELIER.png" alt="STUSH Atelier" fill sizes="100vw" />
+      <section className="flag-atelier stush-campaign-art">
+        <Image src={STUSH_HOUSE_WORLD.rainyBoutique.src} alt={STUSH_HOUSE_WORLD.rainyBoutique.alt} fill sizes="100vw" />
         <div className="flag-atelier__veil" />
-        <div className="flag-atelier__copy"><span className="flag-kicker">THE ATELIER / LIMITED RUNS</span><h2>BUILT FOR<br/><em>THE NEXT ROOM.</em></h2><p>The fall wardrobe is being tightened around statement layers, essentials and complete looks.</p><div><a href="/collections" className="flag-btn flag-btn--light">ENTER COLLECTIONS</a><a href="/lookbook" className="flag-link">VIEW THE EDIT ↗</a></div></div>
+        <div className="flag-atelier__copy"><span className="flag-kicker">THE HOUSE / AFTER DARK</span><h2>BUILT FOR<br/><em>THE NEXT ROOM.</em></h2><p>The wardrobe is only part of STUSH. The world around it should feel just as considered.</p><div><a href="/collections" className="flag-btn flag-btn--light">ENTER COLLECTIONS</a><a href="/lookbook" className="flag-link">VIEW THE EDIT ↗</a></div></div>
       </section>
 
       <section className="flag-society" id="society">

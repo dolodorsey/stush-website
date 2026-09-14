@@ -62,7 +62,6 @@ async function warmVisualAssets(page) {
     }).catch(() => {});
   }
 
-  window;
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(300);
 }

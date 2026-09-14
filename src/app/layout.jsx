@@ -6,6 +6,7 @@ import './stush-fixes.css';
 import './stush-pages-v2.css';
 import './production-refinement.css';
 import './stush-visual-standard.css';
+import './category-editorial.css';
 import { Bodoni_Moda, DM_Mono, DM_Sans } from 'next/font/google';
 import MobileMenu from '@/components/MobileMenu';
 import NavScroll from '@/components/NavScroll';
@@ -24,8 +25,8 @@ export const metadata = {
 
 const NAV = [
   { label: 'Shop', href: '/shop' },
-  { label: 'Women', href: '/collections/stush#women' },
-  { label: 'Essentials', href: '/collections/stush#essentials' },
+  { label: 'Women', href: '/collections/women' },
+  { label: 'Essentials', href: '/collections/essentials' },
   { label: 'Collections', href: '/collections' },
   { label: 'Lookbook', href: '/lookbook' },
   { label: 'Journal', href: '/journal' },
@@ -48,7 +49,7 @@ export default function RootLayout({ children }) {
         <footer className="footer">
           <div className="footer__top">
             <div><div className="footer__brand">Stush</div><p className="footer__desc">An editorial house from Atlanta. Pieces for the room, the runway and the people who refuse to dress for everyone else.</p></div>
-            <div><div className="footer__heading">Shop</div><a href="/shop" className="footer__link">The Wardrobe</a><a href="/collections/stush#women" className="footer__link">Women</a><a href="/collections/stush#essentials" className="footer__link">Essentials</a><a href="/collections" className="footer__link">Collections</a></div>
+            <div><div className="footer__heading">Shop</div><a href="/shop" className="footer__link">The Wardrobe</a><a href="/collections/women" className="footer__link">Women</a><a href="/collections/essentials" className="footer__link">Essentials</a><a href="/collections" className="footer__link">Collections</a></div>
             <div><div className="footer__heading">Editorial</div><a href="/lookbook" className="footer__link">Lookbook</a><a href="/journal" className="footer__link">Journal</a><a href="/#society" className="footer__link">The Society</a></div>
             <div><div className="footer__heading">House</div><a href="/forms/inquiry" className="footer__link">Client Services</a><a href="/forms/influencer" className="footer__link">Creative Partnerships</a><a href="/forms/sponsor" className="footer__link">Brand Partnerships</a><span className="footer__link">Atlanta · Global Delivery</span></div>
           </div>

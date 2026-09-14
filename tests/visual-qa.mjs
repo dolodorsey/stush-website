@@ -26,29 +26,45 @@ async function openAndAssert(page, route) {
 }
 
 async function warmVisualAssets(page) {
+  // Force the QA browser to behave like a user who actually traversed every visual.
+  // This avoids false "blank" screenshots caused by browser-native lazy loading.
+  await page.evaluate(() => {
+    document.querySelectorAll('img').forEach(img => { img.loading = 'eager'; });
+  });
+
   await page.evaluate(async () => {
-    const step = Math.max(420, Math.floor(window.innerHeight * .72));
-    for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
+    const step = Math.max(420, Math.floor(window.innerHeight * .68));
+    let max = document.documentElement.scrollHeight;
+    for (let y = 0; y < max; y += step) {
       window.scrollTo(0, y);
       await new Promise(resolve => setTimeout(resolve, 90));
+      max = Math.max(max, document.documentElement.scrollHeight);
     }
-    const cards = [...document.querySelectorAll('.stush-product-card')];
-    for (const card of cards) {
-      card.scrollIntoView({ block: 'center' });
-      await new Promise(resolve => setTimeout(resolve, 35));
-      const img = card.querySelector('img');
-      if (img?.decode) { try { await img.decode(); } catch {} }
-    }
-    window.scrollTo(0, 0);
   });
-  await page.waitForTimeout(250);
-  await page.evaluate(async () => {
-    const pending = [...document.images].map(async img => {
+
+  // Visit every image individually so lower lookbook/editorial cells receive a
+  // real viewport intersection before we decide that the page is visually sound.
+  const imageCount = await page.locator('img').count();
+  for (let index = 0; index < imageCount; index += 1) {
+    const image = page.locator('img').nth(index);
+    await image.scrollIntoViewIfNeeded().catch(() => {});
+    await page.waitForTimeout(25);
+    await image.evaluate(async img => {
+      if (img.complete && img.naturalWidth > 0) return;
+      await Promise.race([
+        new Promise(resolve => {
+          img.addEventListener('load', resolve, { once: true });
+          img.addEventListener('error', resolve, { once: true });
+        }),
+        new Promise(resolve => setTimeout(resolve, 2500)),
+      ]);
       if (img.decode) { try { await img.decode(); } catch {} }
-    });
-    await Promise.race([Promise.all(pending), new Promise(resolve => setTimeout(resolve, 7000))]);
-  });
-  await page.waitForTimeout(250);
+    }).catch(() => {});
+  }
+
+  window;
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(300);
 }
 
 async function assertCommerceVisibility(page, route) {
@@ -94,6 +110,26 @@ async function assertCommerceVisibility(page, route) {
   if (commerce.broken.length) throw new Error(`${route} has ${commerce.broken.length} broken commerce image/card(s): ${JSON.stringify(commerce.broken.slice(0, 8))}`);
   if (route === '/shop' && commerce.expectedShopCount !== null && commerce.count !== commerce.expectedShopCount) throw new Error(`/shop renders ${commerce.count} cards but live summary says ${commerce.expectedShopCount}`);
   if (route.startsWith('/collections/') && commerce.expectedEditCount !== null && commerce.count !== commerce.expectedEditCount) throw new Error(`${route} renders ${commerce.count} cards but editorial floor expects ${commerce.expectedEditCount}`);
+}
+
+async function assertEditorialImages(page, route) {
+  const result = await page.evaluate(() => {
+    const nodes = [...document.querySelectorAll('.lookbook img,.journal-lead img,.journal-story img,.edit-stage img,.category-landing img,.flag-campaign img,.flag-atelier img')];
+    const broken = nodes.map((img, index) => ({
+      index,
+      alt: img.alt || '',
+      complete: img.complete,
+      naturalWidth: img.naturalWidth,
+      naturalHeight: img.naturalHeight,
+      currentSrc: img.currentSrc || img.src || '',
+      opacity: Number.parseFloat(getComputedStyle(img).opacity || '1'),
+      width: img.getBoundingClientRect().width,
+      height: img.getBoundingClientRect().height,
+    })).filter(item => !item.complete || item.naturalWidth < 50 || item.naturalHeight < 50 || !item.currentSrc || item.opacity < .1 || item.width < 20 || item.height < 20);
+    return { count: nodes.length, broken };
+  });
+  manifest.checks.push({ route, type: 'editorial-images', count: result.count, broken: result.broken.length });
+  if (result.broken.length) throw new Error(`${route} has ${result.broken.length} broken editorial image(s): ${JSON.stringify(result.broken.slice(0, 8))}`);
 }
 
 async function assertNoSuspiciousBlankBlocks(page, route) {
@@ -146,6 +182,7 @@ async function capture(viewport, routes, { fullPage = true } = {}) {
     await openAndAssert(page, route);
     await warmVisualAssets(page);
     await assertCommerceVisibility(page, route);
+    await assertEditorialImages(page, route);
     await assertNoSuspiciousBlankBlocks(page, route);
     await assertCategoryIdentity(page, route);
     if (route === '/') await assertHomepageContract(page);

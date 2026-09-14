@@ -6,8 +6,10 @@ export default function ExperienceLayer() {
     const root = document.documentElement;
     root.classList.add('stush-motion-ready');
 
-    // Reveal individual content elements only. Never hide full commerce sections.
-    const targets = [...document.querySelectorAll('.stush-product-card,.campaign-card,.lookbook-card,.journal-card,figure,[data-stush-reveal]')];
+    // Commerce is never hidden. Reveal only editorial/supporting elements so products
+    // remain visible even when IntersectionObserver is delayed, disabled or missed.
+    const targets = [...document.querySelectorAll('.campaign-card,.lookbook-card,.journal-card,figure,[data-stush-reveal]')]
+      .filter(el => !el.closest('.stush-product-card'));
     targets.forEach((el, index) => {
       el.classList.add('stush-reveal');
       el.style.setProperty('--stush-delay', `${(index % 5) * 45}ms`);

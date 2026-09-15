@@ -17,7 +17,11 @@ export default function JournalPage() {
   const [lead, ...stories] = JOURNAL_ENTRIES;
   return (
     <>
-      <header className="journal-masthead" data-qa="journal-masthead">
+      <header
+        className="journal-masthead stush-house-backdrop stush-house-backdrop--journal"
+        style={{ '--stush-house-bg': `url(${STUSH_HOUSE_WORLD.rainyBoutique.src})` }}
+        data-qa="journal-masthead"
+      >
         <div className="journal-masthead__meta"><span>STUSH HOUSE NOTES</span><span>ISSUE 001 / FALL 26</span><span>ATLANTA → WORLD</span></div>
         <h1>JOURNAL</h1>
       </header>
@@ -32,7 +36,7 @@ export default function JournalPage() {
         </div>
       </section>
 
-      <section className="journal-issues" data-qa="journal-issues">
+      <section className="journal-issues stush-house-backdrop stush-house-backdrop--journal-issues" style={{ '--stush-house-bg': `url(${STUSH_HOUSE_WORLD.dressingRoom.src})` }} data-qa="journal-issues">
         <div className="journal-issues__grid stush-campaign-art">
           {stories.map(entry => (
             <article className="journal-story" key={entry.title}>
@@ -43,7 +47,7 @@ export default function JournalPage() {
         </div>
       </section>
 
-      <section className="journal-departments">
+      <section className="journal-departments stush-house-backdrop stush-house-backdrop--quiet" style={{ '--stush-house-bg': `url(${STUSH_HOUSE_WORLD.chrome.src})` }}>
         <small>JOURNAL DEPARTMENTS / PERMANENT INDEX</small>
         <div className="journal-departments__row">
           <span><small>01</small>House Code<small>PHILOSOPHY</small></span>

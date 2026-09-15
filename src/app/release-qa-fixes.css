@@ -42,6 +42,25 @@
   max-width:100%;
 }
 
+/* JOURNAL: screenshot review found the permanent index losing contrast against
+   the light chrome/satin treatment. Keep the luxurious pale background but
+   restore ink-level readability and hierarchy. */
+.journal-departments.stush-house-backdrop--quiet{
+  color:#111!important;
+  background-image:linear-gradient(rgba(244,239,231,.93),rgba(244,239,231,.95)),var(--stush-house-bg)!important;
+}
+.journal-departments.stush-house-backdrop--quiet>small,
+.journal-departments.stush-house-backdrop--quiet .journal-departments__row>span,
+.journal-departments.stush-house-backdrop--quiet .journal-departments__row>span>small{
+  color:#111!important;
+}
+.journal-departments.stush-house-backdrop--quiet .journal-departments__row>span{
+  border-color:rgba(17,17,17,.18)!important;
+}
+.journal-departments.stush-house-backdrop--quiet .journal-departments__row>span>small{
+  opacity:.58;
+}
+
 @media(max-width:900px){
   .lb-cinema{
     grid-template-columns:minmax(0,1fr)!important;

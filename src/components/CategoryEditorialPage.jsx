@@ -3,73 +3,60 @@ import { getProducts } from '@/lib/shopify';
 import CurtainCard from '@/components/CurtainCard';
 import { groupStushProducts, sortStushProducts, STUSH_CATEGORIES } from '@/lib/stush-categories';
 import { getCommerceCardProduct, getCommerceLeadImage } from '@/lib/stush-merchandising';
-import { STUSH_CATEGORY_CAMPAIGN } from '@/lib/stush-campaign-assets';
+import { STUSH_CATEGORY_CAMPAIGN, STUSH_HOUSE_WORLD } from '@/lib/stush-campaign-assets';
 
 const EDITS = {
   essentials: {
-    kicker: 'FOUNDATION / FALL 26',
-    titleA: 'THE DAILY', titleB: 'CODE.',
+    kicker: 'FOUNDATION / FALL 26', titleA: 'THE DAILY', titleB: 'CODE.',
     intro: 'The pieces that make the rest of the wardrobe work: weight, proportion and repeat wear without disappearing into basics.',
-    code: ['WEIGHT', 'LAYER', 'REPEAT'],
-    layout: 'foundation',
-    campaignLine: 'THE PIECES THAT MAKE THE REST OF THE ROOM WORK.',
+    code: ['WEIGHT', 'LAYER', 'REPEAT'], layout: 'foundation', campaignLine: 'THE PIECES THAT MAKE THE REST OF THE ROOM WORK.',
   },
   women: {
-    kicker: 'WOMEN / FALL 26',
-    titleA: 'CUT FOR', titleB: 'PRESENCE.',
+    kicker: 'WOMEN / FALL 26', titleA: 'CUT FOR', titleB: 'PRESENCE.',
     intro: 'Cropped proportion, strong lines and pieces built to change the room before the conversation starts.',
-    code: ['PROPORTION', 'MOVEMENT', 'CONTRAST'],
-    layout: 'portrait',
-    campaignLine: 'PRESENCE BEFORE INTRODUCTION.',
+    code: ['PROPORTION', 'MOVEMENT', 'CONTRAST'], layout: 'portrait', campaignLine: 'PRESENCE BEFORE INTRODUCTION.',
   },
   outerwear: {
-    kicker: 'OUTERWEAR / FALL 26',
-    titleA: 'THE OUTER', titleB: 'LINE.',
+    kicker: 'OUTERWEAR / FALL 26', titleA: 'THE OUTER', titleB: 'LINE.',
     intro: 'Structure first. Jackets and layers judged by silhouette, hardware, weight and what they do to everything underneath.',
-    code: ['STRUCTURE', 'HARDWARE', 'WEATHER'],
-    layout: 'monolith',
-    campaignLine: 'THE FIRST THING THE ROOM SEES.',
+    code: ['STRUCTURE', 'HARDWARE', 'WEATHER'], layout: 'monolith', campaignLine: 'THE FIRST THING THE ROOM SEES.',
   },
   hoodies: {
-    kicker: 'FLEECE STUDY / FALL 26',
-    titleA: 'WEIGHT IN', titleB: 'MOTION.',
+    kicker: 'FLEECE STUDY / FALL 26', titleA: 'WEIGHT IN', titleB: 'MOTION.',
     intro: 'Wash, hand feel and volume turn familiar fleece into the part of the look that carries the most attitude.',
-    code: ['WASH', 'WEIGHT', 'LAYER'],
-    layout: 'washed',
-    campaignLine: 'FAMILIAR SHAPE. HEAVIER PRESENCE.',
+    code: ['WASH', 'WEIGHT', 'LAYER'], layout: 'washed', campaignLine: 'FAMILIAR SHAPE. HEAVIER PRESENCE.',
   },
   jerseys: {
-    kicker: 'SPORT CODE / FALL 26',
-    titleA: 'UNIFORM', titleB: 'REWRITTEN.',
+    kicker: 'SPORT CODE / FALL 26', titleA: 'UNIFORM', titleB: 'REWRITTEN.',
     intro: 'Sport language without costume: collar, number, contrast and the confidence of a uniform moved into nightlife.',
-    code: ['NUMBER', 'COLLAR', 'SIGNAL'],
-    layout: 'scoreboard',
-    campaignLine: 'SPORT LANGUAGE MOVED INTO THE CITY.',
+    code: ['NUMBER', 'COLLAR', 'SIGNAL'], layout: 'scoreboard', campaignLine: 'SPORT LANGUAGE MOVED INTO THE CITY.',
   },
   tops: {
-    kicker: 'CORE LAYERS / FALL 26',
-    titleA: 'THE FIRST', titleB: 'LAYER.',
+    kicker: 'CORE LAYERS / FALL 26', titleA: 'THE FIRST', titleB: 'LAYER.',
     intro: 'The graphic, crop and boxy shapes that set the proportion before the rest of the fit gets involved.',
-    code: ['GRAPHIC', 'PROPORTION', 'GROUND'],
-    layout: 'paper',
-    campaignLine: 'GRAPHICS THAT DO MORE THAN FILL A CHEST.',
+    code: ['GRAPHIC', 'PROPORTION', 'GROUND'], layout: 'paper', campaignLine: 'GRAPHICS THAT DO MORE THAN FILL A CHEST.',
   },
   bottoms: {
-    kicker: 'BOTTOMS / FALL 26',
-    titleA: 'LINE FROM', titleB: 'THE WAIST.',
+    kicker: 'BOTTOMS / FALL 26', titleA: 'LINE FROM', titleB: 'THE WAIST.',
     intro: 'Width, drape and movement. The lower half is treated as architecture instead of an afterthought.',
-    code: ['DRAPE', 'WIDTH', 'MOVEMENT'],
-    layout: 'runway',
-    campaignLine: 'PROPORTION STARTS AT THE FLOOR.',
+    code: ['DRAPE', 'WIDTH', 'MOVEMENT'], layout: 'runway', campaignLine: 'PROPORTION STARTS AT THE FLOOR.',
   },
   accessories: {
-    kicker: 'FINISHING PIECES / FALL 26',
-    titleA: 'THE LAST', titleB: 'DETAIL.',
+    kicker: 'FINISHING PIECES / FALL 26', titleA: 'THE LAST', titleB: 'DETAIL.',
     intro: 'Small objects with enough identity to finish the whole silhouette. Scale matters more when the object is smaller.',
-    code: ['DETAIL', 'SCALE', 'FINISH'],
-    layout: 'macro',
-    campaignLine: 'THE SMALLEST OBJECT CAN HOLD THE WHOLE LOOK.',
+    code: ['DETAIL', 'SCALE', 'FINISH'], layout: 'macro', campaignLine: 'THE SMALLEST OBJECT CAN HOLD THE WHOLE LOOK.',
   },
+};
+
+const HOUSE_BACKDROPS = {
+  essentials: STUSH_HOUSE_WORLD.chrome,
+  women: STUSH_HOUSE_WORLD.dressingRoom,
+  outerwear: STUSH_HOUSE_WORLD.rainyBoutique,
+  hoodies: STUSH_HOUSE_WORLD.crystal,
+  jerseys: STUSH_HOUSE_WORLD.rainyBoutique,
+  tops: STUSH_HOUSE_WORLD.chrome,
+  bottoms: STUSH_HOUSE_WORLD.roses,
+  accessories: STUSH_HOUSE_WORLD.dressingRoom,
 };
 
 function media(product) {
@@ -78,22 +65,15 @@ function media(product) {
   return src ? { src, alt: image?.alt || image?.altText || product?.title || 'STUSH product' } : null;
 }
 
-function cleanTitle(title = '') {
-  return title.replace(/^Stush\s*[—-]\s*/i, '');
-}
+function cleanTitle(title = '') { return title.replace(/^Stush\s*[—-]\s*/i, ''); }
 
-export function isEditorialCategory(key) {
-  return Boolean(EDITS[key]);
-}
+export function isEditorialCategory(key) { return Boolean(EDITS[key]); }
 
 export function categoryMetadata(key) {
   const config = EDITS[key];
   const category = STUSH_CATEGORIES.find(item => item.key === key);
   if (!config || !category) return null;
-  return {
-    title: `${category.label} — STUSH`,
-    description: `${category.label}, Fall/Winter 2026. ${config.intro}`,
-  };
+  return { title: `${category.label} — STUSH`, description: `${category.label}, Fall/Winter 2026. ${config.intro}` };
 }
 
 export default async function CategoryEditorialPage({ categoryKey }) {
@@ -108,10 +88,16 @@ export default async function CategoryEditorialPage({ categoryKey }) {
   const heroProducts = rawProducts.map(product => ({ product, media: media(product) })).filter(item => item.media).slice(0, 3);
   const adjacent = STUSH_CATEGORIES.filter(item => item.key !== categoryKey && (grouped[item.key] || []).length > 0).slice(0, 3);
   const campaign = STUSH_CATEGORY_CAMPAIGN[categoryKey];
+  const houseBackdrop = HOUSE_BACKDROPS[categoryKey] || STUSH_HOUSE_WORLD.chrome;
 
   return (
-    <div className={`edit-page edit-page--${categoryKey} edit-page--layout-${config.layout}`} data-qa="category-edit" data-category={categoryKey}>
-      <section className="edit-hero">
+    <div
+      className={`edit-page edit-page--${categoryKey} edit-page--layout-${config.layout}`}
+      data-qa="category-edit"
+      data-category={categoryKey}
+      style={{ '--stush-house-bg': `url(${houseBackdrop.src})` }}
+    >
+      <section className="edit-hero stush-house-backdrop stush-house-backdrop--edit-hero">
         <div className="edit-hero__copy">
           <a className="edit-crumb" href="/collections">STUSH / WARDROBE / {category.label.toUpperCase()}</a>
           <span className="edit-kicker">{config.kicker}</span>
@@ -165,7 +151,7 @@ export default async function CategoryEditorialPage({ categoryKey }) {
         )}
       </section>
 
-      <section className="edit-next">
+      <section className="edit-next stush-house-backdrop stush-house-backdrop--edit-next">
         <span className="edit-kicker">MOVE THROUGH THE WARDROBE</span>
         <div className="edit-next__grid">
           {adjacent.map((item, index) => (

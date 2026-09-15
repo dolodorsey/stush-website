@@ -11,6 +11,7 @@ import './qa-fixes.css';
 import './campaign-refresh.css';
 import './house-world-v2.css';
 import './release-qa-fixes.css';
+import './density-pass.css';
 import { Bodoni_Moda, DM_Mono, DM_Sans } from 'next/font/google';
 import MobileMenu from '@/components/MobileMenu';
 import NavScroll from '@/components/NavScroll';

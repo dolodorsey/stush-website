@@ -1,0 +1,93 @@
+/* ============================================================
+   STUSH HOUSE WORLD V2
+   User-supplied campaign graphics are atmosphere/UI material:
+   backgrounds, section transitions and editorial storytelling.
+   They never replace live Shopify product photography.
+   ============================================================ */
+
+.stush-house-backdrop{
+  background-color:#0a0a0a;
+  background-image:linear-gradient(90deg,rgba(5,5,6,.93),rgba(5,5,6,.78)),var(--stush-house-bg);
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+}
+.stush-house-backdrop--quiet{
+  background-color:#f1ece3;
+  background-image:linear-gradient(rgba(241,236,227,.965),rgba(241,236,227,.965)),var(--stush-house-bg);
+  background-size:cover;
+  background-position:center;
+}
+.stush-house-backdrop--page-head{
+  background-color:#eee9e0!important;
+  background-image:linear-gradient(90deg,rgba(238,233,224,.98) 0%,rgba(238,233,224,.93) 48%,rgba(238,233,224,.76) 100%),var(--stush-house-bg)!important;
+  background-size:cover!important;
+  background-position:center!important;
+}
+
+/* SECONDARY FILM — this is deliberately NOT the homepage landing film. */
+.secondary-house-film{position:relative;width:100%;min-height:320px;aspect-ratio:16/9;overflow:hidden;background:#050505;border:1px solid rgba(255,255,255,.12)}
+.secondary-house-film video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.secondary-house-film__veil{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.28))}
+.secondary-house-film__mark{position:absolute;z-index:2;left:18px;bottom:16px;padding:7px 9px;background:rgba(0,0,0,.55);color:rgba(255,255,255,.78);font:500 8px/1 var(--font-stush-mono);letter-spacing:.16em;text-transform:uppercase}
+.secondary-house-film--compact{min-height:260px;aspect-ratio:16/10}
+
+/* HOME — film stays untouched at the top; house graphics deepen lower UI. */
+.home-motion-world{display:grid;grid-template-columns:minmax(0,.78fr) minmax(520px,1.22fr);gap:clamp(28px,5vw,76px);align-items:center;padding:clamp(70px,9vw,135px) var(--gutter);color:#f4f0e8;border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1)}
+.home-motion-world__copy{max-width:670px}
+.home-motion-world__copy h2{margin:18px 0 24px;font:400 clamp(50px,6.4vw,102px)/.86 var(--font-stush-serif);letter-spacing:-.05em}
+.home-motion-world__copy h2 em{font-weight:400;color:#c51820}
+.home-motion-world__copy p{max-width:540px;margin:0 0 24px;color:rgba(244,240,232,.66);font-size:clamp(14px,1.2vw,18px);line-height:1.65}
+.home-motion-world__copy .flag-link{color:#f4f0e8}
+.home-motion-world__film{box-shadow:0 24px 80px rgba(0,0,0,.42)}
+.flag-index.stush-house-backdrop--quiet{background-attachment:scroll}
+.flag-thesis.stush-house-backdrop--thesis{background-image:linear-gradient(90deg,rgba(5,5,6,.93),rgba(5,5,6,.76)),var(--stush-house-bg)!important;background-size:cover!important;background-position:center!important}
+.flag-society.stush-house-backdrop--society{background-image:linear-gradient(rgba(7,7,8,.9),rgba(7,7,8,.94)),var(--stush-house-bg)!important;background-size:cover!important;background-position:center!important}
+
+/* SHOP — commerce remains clean; atmosphere frames it. */
+.shop-house-motion{display:grid;grid-template-columns:minmax(420px,1.15fr) minmax(320px,.85fr);gap:clamp(28px,5vw,70px);align-items:center;margin:0 var(--gutter) clamp(50px,7vw,100px);padding:clamp(32px,5vw,70px);color:#f4f0e8;border:1px solid rgba(255,255,255,.1)}
+.shop-house-motion__copy>span,.collections-motion-band__copy>span{font:500 8px/1.2 var(--font-stush-mono);letter-spacing:.16em;text-transform:uppercase;color:#ba8e3e}
+.shop-house-motion__copy h2,.collections-motion-band__copy h2{margin:16px 0 20px;font:400 clamp(42px,5.2vw,78px)/.88 var(--font-stush-serif);letter-spacing:-.045em}
+.shop-house-motion__copy h2 em,.collections-motion-band__copy h2 em{font-weight:400;color:#c51820}
+.shop-house-motion__copy p,.collections-motion-band__copy p{max-width:480px;color:rgba(244,240,232,.64);font-size:14px;line-height:1.65}
+.shop-house-motion__copy a{display:inline-block;margin-top:22px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,.68);font:500 8px/1 var(--font-stush-mono);letter-spacing:.14em;text-transform:uppercase;color:#fff}
+.shop-floor-shell{padding-top:clamp(30px,4vw,60px);background-image:linear-gradient(rgba(241,236,227,.985),rgba(241,236,227,.985)),var(--stush-house-bg)!important;background-size:cover!important;background-position:center!important}
+
+/* COLLECTIONS — one house, different rooms. */
+.collections-motion-band{display:grid;grid-template-columns:minmax(0,.82fr) minmax(480px,1.18fr);gap:clamp(30px,5vw,72px);align-items:center;padding:clamp(56px,7vw,100px) var(--gutter);color:#f4f0e8;border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1)}
+.collections-motion-band__copy{max-width:660px}
+
+/* CATEGORY EDITS — use the house art as texture behind each identity, not product truth. */
+.edit-hero.stush-house-backdrop{background-size:cover!important;background-position:center!important}
+.edit-page--women .edit-hero.stush-house-backdrop{background-image:linear-gradient(90deg,rgba(238,230,220,.97) 0%,rgba(238,230,220,.88) 49%,rgba(238,230,220,.40) 100%),var(--stush-house-bg)!important}
+.edit-page--essentials .edit-hero.stush-house-backdrop,.edit-page--tops .edit-hero.stush-house-backdrop{background-image:linear-gradient(90deg,rgba(245,241,233,.98) 0%,rgba(245,241,233,.90) 48%,rgba(245,241,233,.42) 100%),var(--stush-house-bg)!important}
+.edit-page--outerwear .edit-hero.stush-house-backdrop,.edit-page--hoodies .edit-hero.stush-house-backdrop,.edit-page--jerseys .edit-hero.stush-house-backdrop,.edit-page--bottoms .edit-hero.stush-house-backdrop,.edit-page--accessories .edit-hero.stush-house-backdrop{background-image:linear-gradient(90deg,rgba(8,9,11,.97) 0%,rgba(8,9,11,.87) 47%,rgba(8,9,11,.36) 100%),var(--stush-house-bg)!important}
+.edit-next.stush-house-backdrop--edit-next{background-image:linear-gradient(rgba(8,8,9,.92),rgba(8,8,9,.95)),var(--stush-house-bg)!important;background-size:cover!important;background-position:center!important}
+.edit-page--women .edit-next.stush-house-backdrop--edit-next,.edit-page--essentials .edit-next.stush-house-backdrop--edit-next,.edit-page--tops .edit-next.stush-house-backdrop--edit-next{background-image:linear-gradient(rgba(241,236,227,.96),rgba(241,236,227,.96)),var(--stush-house-bg)!important}
+
+/* LOOKBOOK / JOURNAL */
+.lb-cinema__film>.secondary-house-film{width:100%;height:100%;min-height:100%;aspect-ratio:auto;border:0}
+.lb-cinema__film>.secondary-house-film .secondary-house-film__mark{left:22px;bottom:22px}
+.lb-manifesto.stush-house-backdrop{background-image:linear-gradient(90deg,rgba(7,7,8,.95),rgba(7,7,8,.78)),var(--stush-house-bg)!important;background-size:cover!important;background-position:center!important}
+.journal-masthead.stush-house-backdrop--journal{background-image:linear-gradient(90deg,rgba(7,7,8,.95),rgba(7,7,8,.72)),var(--stush-house-bg)!important;background-size:cover!important;background-position:center 65%!important}
+.journal-issues.stush-house-backdrop--journal-issues{background-image:linear-gradient(rgba(9,9,10,.95),rgba(9,9,10,.97)),var(--stush-house-bg)!important;background-size:cover!important;background-position:center!important}
+
+@media(max-width:920px){
+  .home-motion-world,.shop-house-motion,.collections-motion-band{grid-template-columns:1fr}
+  .home-motion-world__film{order:-1}
+  .shop-house-motion{margin-inline:0;border-inline:0}
+  .collections-motion-band{padding-inline:20px}
+}
+
+@media(max-width:620px){
+  .secondary-house-film{min-height:230px;aspect-ratio:4/3}
+  .secondary-house-film--compact{min-height:220px;aspect-ratio:4/3}
+  .home-motion-world,.shop-house-motion,.collections-motion-band{padding:42px 16px}
+  .home-motion-world__copy h2,.shop-house-motion__copy h2,.collections-motion-band__copy h2{font-size:clamp(38px,12vw,58px)}
+  .stush-house-backdrop{background-attachment:scroll!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .secondary-house-film video{display:none}
+  .secondary-house-film{background:#090909}
+}

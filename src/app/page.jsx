@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { getProducts, SHOP_URL } from '@/lib/shopify';
 import CurtainCard from '@/components/CurtainCard';
+import SecondaryHouseFilm from '@/components/SecondaryHouseFilm';
 import { STUSH_CATEGORIES, groupStushProducts, sortStushProducts } from '@/lib/stush-categories';
 import { getCommerceCardProduct, getCommerceLeadImage } from '@/lib/stush-merchandising';
 import { STUSH_CATEGORY_CAMPAIGN, STUSH_HOUSE_WORLD } from '@/lib/stush-campaign-assets';
@@ -29,6 +30,7 @@ export default async function HomePage() {
 
   return (
     <div className="flagship">
+      {/* LOCKED: the homepage landing film stays exactly separate, wordless and unchanged. */}
       <section className="flag-hero" data-qa="animation-hero" aria-label="STUSH campaign film">
         <video
           className="flag-hero__media"
@@ -65,6 +67,20 @@ export default async function HomePage() {
         <div className="flag-product-grid">{featured.map((product, index) => <CurtainCard key={product.id} product={product} priority={index < 4} />)}</div>
       </section>
 
+      <section
+        className="home-motion-world stush-house-backdrop"
+        style={{ '--stush-house-bg': `url(${STUSH_HOUSE_WORLD.dressingRoom.src})` }}
+        data-qa="home-secondary-motion"
+      >
+        <div className="home-motion-world__copy">
+          <span className="flag-kicker">HOUSE MOTION / 002</span>
+          <h2>THE BRAND<br/><em>DOESN'T STOP</em><br/>AT PRODUCT.</h2>
+          <p>The atmosphere around STUSH should feel as deliberate as the garments: after-dark rooms, reflective surfaces, black satin, city light and private access.</p>
+          <a href="/lookbook" className="flag-link">ENTER THE HOUSE WORLD ↗</a>
+        </div>
+        <SecondaryHouseFilm className="home-motion-world__film" label="STUSH secondary house animation" />
+      </section>
+
       <section className="flag-campaigns stush-campaign-art" data-qa="campaign-chapters">
         <header><span className="flag-kicker">THE WARDROBE / FALL 26</span><h2>THE CLOTHES<br/><em>COME ALIVE.</em></h2></header>
         <div className="flag-campaigns__grid">
@@ -81,7 +97,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="flag-index">
+      <section
+        className="flag-index stush-house-backdrop stush-house-backdrop--quiet"
+        style={{ '--stush-house-bg': `url(${STUSH_HOUSE_WORLD.chrome.src})` }}
+      >
         <header><span className="flag-kicker">THE WARDROBE</span><h2>SHOP BY<br/>CATEGORY.</h2></header>
         <div className="flag-index__list">
           {shopChapters.map((section, index) => (
@@ -108,7 +127,10 @@ export default async function HomePage() {
         </a>
       </section>
 
-      <section className="flag-thesis">
+      <section
+        className="flag-thesis stush-house-backdrop stush-house-backdrop--thesis"
+        style={{ '--stush-house-bg': `url(${STUSH_HOUSE_WORLD.roses.src})` }}
+      >
         <span className="flag-kicker">STUSH / HOUSE CODE 001</span>
         <div className="flag-thesis__grid">
           <h2>NOT MADE<br/>TO BLEND IN.</h2>
@@ -122,7 +144,11 @@ export default async function HomePage() {
         <div className="flag-atelier__copy"><span className="flag-kicker">THE HOUSE / AFTER DARK</span><h2>BUILT FOR<br/><em>THE NEXT ROOM.</em></h2><p>The wardrobe is only part of STUSH. The world around it should feel just as considered.</p><div><a href="/collections" className="flag-btn flag-btn--light">ENTER COLLECTIONS</a><a href="/lookbook" className="flag-link">VIEW THE EDIT ↗</a></div></div>
       </section>
 
-      <section className="flag-society" id="society">
+      <section
+        className="flag-society stush-house-backdrop stush-house-backdrop--society"
+        style={{ '--stush-house-bg': `url(${STUSH_HOUSE_WORLD.dressingRoom.src})` }}
+        id="society"
+      >
         <span className="flag-kicker">PRIVATE ACCESS</span><h2>KNOW BEFORE<br/><em>THE ROOM DOES.</em></h2><p>Fall drops, first access, campaign releases and private invitations.</p>
         <form action={`${SHOP_URL}/contact#contact_form`} method="POST">
           <input type="hidden" name="form_type" value="customer" />

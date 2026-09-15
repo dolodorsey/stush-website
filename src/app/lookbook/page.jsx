@@ -1,3 +1,4 @@
+import SecondaryHouseFilm from '@/components/SecondaryHouseFilm';
 import { STUSH_LOOKBOOK_SEQUENCE, STUSH_HOUSE_WORLD } from '@/lib/stush-campaign-assets';
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +17,7 @@ export default function LookbookPage() {
   return (
     <>
       <section className="lb-cinema" data-qa="lookbook-cinema">
-        <div className="lb-cinema__film"><video autoPlay muted loop playsInline preload="metadata" poster="/campaigns/stush-real-product.png" src="/STUSH_VID.mp4" /></div>
+        <div className="lb-cinema__film"><SecondaryHouseFilm label="STUSH Fall 26 secondary house animation" /></div>
         <aside className="lb-cinema__rail">
           <small>STUSH / FALL 26 / CAMPAIGN 001</small>
           <h1>THE<br/><em>LOOKBOOK.</em></h1>
@@ -24,7 +25,7 @@ export default function LookbookPage() {
         </aside>
       </section>
 
-      <section className="lb-manifesto">
+      <section className="lb-manifesto stush-house-backdrop" style={{ '--stush-house-bg': `url(${STUSH_HOUSE_WORLD.dressingRoom.src})` }}>
         <span>CAMPAIGN NOTE / 01</span>
         <p>Clothes are not finished until they meet a <em>room.</em> Fall 26 is built to hold one.</p>
       </section>

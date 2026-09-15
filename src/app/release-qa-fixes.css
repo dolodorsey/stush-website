@@ -1,0 +1,71 @@
+/* STUSH release QA corrections — surgical, screenshot-driven fixes only. */
+
+/* LOOKBOOK: keep the cinematic split inside the viewport at every width.
+   The secondary film is allowed to flex; neither the film nor editorial rail
+   may impose an intrinsic width on the document. */
+.lb-cinema{
+  width:100%;
+  max-width:100vw;
+  min-width:0;
+  overflow-x:clip;
+  grid-template-columns:minmax(0,1.22fr) minmax(280px,.78fr)!important;
+}
+.lb-cinema>*{
+  min-width:0;
+  max-width:100%;
+}
+.lb-cinema__film{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+}
+.lb-cinema__film>.secondary-house-film{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  overflow:hidden!important;
+}
+.lb-cinema__rail{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+}
+.lb-cinema__rail h1{
+  max-width:100%;
+  font-size:clamp(54px,7.2vw,118px)!important;
+  overflow-wrap:anywhere;
+}
+.lb-sequence,.lb-sequence .lookbook,.lb-row,.lb-cell{
+  min-width:0;
+  max-width:100%;
+}
+
+/* JOURNAL: screenshot review found the permanent index losing contrast against
+   the light chrome/satin treatment. Keep the luxurious pale background but
+   restore ink-level readability and hierarchy. */
+.journal-departments.stush-house-backdrop--quiet{
+  color:#111!important;
+  background-image:linear-gradient(rgba(244,239,231,.93),rgba(244,239,231,.95)),var(--stush-house-bg)!important;
+}
+.journal-departments.stush-house-backdrop--quiet>small,
+.journal-departments.stush-house-backdrop--quiet .journal-departments__row>span,
+.journal-departments.stush-house-backdrop--quiet .journal-departments__row>span>small{
+  color:#111!important;
+}
+.journal-departments.stush-house-backdrop--quiet .journal-departments__row>span{
+  border-color:rgba(17,17,17,.18)!important;
+}
+.journal-departments.stush-house-backdrop--quiet .journal-departments__row>span>small{
+  opacity:.58;
+}
+
+@media(max-width:900px){
+  .lb-cinema{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  .lb-cinema__rail h1{
+    font-size:clamp(50px,14vw,92px)!important;
+  }
+}

@@ -1,4 +1,5 @@
 import { getCollections, getCollectionProducts } from '@/lib/shopify';
+import SecondaryHouseFilm from '@/components/SecondaryHouseFilm';
 import { STUSH_CATEGORIES, groupStushProducts, sortStushProducts } from '@/lib/stush-categories';
 import { getCommerceLeadImage } from '@/lib/stush-merchandising';
 import { STUSH_CATEGORY_CAMPAIGN, STUSH_HOUSE_WORLD } from '@/lib/stush-campaign-assets';
@@ -27,7 +28,10 @@ export default async function CollectionsPage() {
 
   return (
     <>
-      <header className="page-head page-head--collection page-head--collections-index">
+      <header
+        className="page-head page-head--collection page-head--collections-index stush-house-backdrop stush-house-backdrop--page-head"
+        style={{ '--stush-house-bg': `url(${STUSH_HOUSE_WORLD.dressingRoom.src})` }}
+      >
         <span className="page-head__crumb"><a href="/">Stush</a> / Collections</span>
         <span className="page-head__season">FALL / WINTER 26</span>
         <h1 className="page-head__title">Shop by <em>Wardrobe</em></h1>
@@ -44,6 +48,11 @@ export default async function CollectionsPage() {
             <span>{products.length} active pieces · enter the wardrobe</span>
           </span>
         </a>
+
+        <div className="collections-motion-band stush-house-backdrop" style={{ '--stush-house-bg': `url(${STUSH_HOUSE_WORLD.rainyBoutique.src})` }}>
+          <div className="collections-motion-band__copy"><span>HOUSE MOTION / COLLECTION INDEX</span><h2>EIGHT ROOMS.<br/><em>ONE HOUSE.</em></h2><p>Every category keeps its own personality while the STUSH atmosphere connects the entire wardrobe.</p></div>
+          <SecondaryHouseFilm compact label="STUSH secondary collection animation" />
+        </div>
 
         <div className="category-landing__grid category-landing__grid--v2">
           {categories.map(category => {

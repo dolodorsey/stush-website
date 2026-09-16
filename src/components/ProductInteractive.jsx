@@ -22,14 +22,14 @@ export default function ProductInteractive({ product, descriptionHtml }) {
 
   const currentVariant = useMemo(() => {
     if (variants.length === 0) return null;
-    if (optionNames.length === 0) return variants[0];
-    return variants.find(variant => optionNames.every((option, index) => variant[`option${index + 1}`] === selected[option.name])) || variants[0];
-  }, [selected, variants, optionNames]);
+    if (optionNames.length === 0) return firstAvailable || null;
+    return variants.find(variant => optionNames.every((option, index) => variant[`option${index + 1}`] === selected[option.name])) || null;
+  }, [selected, variants, optionNames, firstAvailable]);
 
   const fmt = value => value ? `$${parseFloat(value).toFixed(0)}` : '';
   const price = fmt(currentVariant?.price);
   const comparePrice = currentVariant?.compare_at_price ? fmt(currentVariant.compare_at_price) : null;
-  const inStock = currentVariant?.available !== false;
+  const inStock = Boolean(currentVariant) && currentVariant.available !== false;
 
   const selectOption = (name, value) => {
     const next = { ...selected, [name]: value };
@@ -156,7 +156,7 @@ export default function ProductInteractive({ product, descriptionHtml }) {
             aria-disabled={!currentVariant || !inStock}
             style={{ opacity: currentVariant && inStock ? 1 : .5, pointerEvents: currentVariant && inStock ? 'auto' : 'none' }}
           >
-            {inStock === false ? 'Sold Out' : checkingOut ? 'Preparing private checkout…' : 'Acquire this piece'}
+            {!currentVariant ? 'Choose an available combination' : !inStock ? 'Sold Out' : checkingOut ? 'Preparing private checkout…' : 'Acquire this piece'}
           </button>
           <a href="/shop" className="btn-ghost">Continue Shopping</a>
         </div>

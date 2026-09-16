@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useMemo, useState } from 'react';
 import { getCommerceGalleryImages } from '@/lib/stush-merchandising';
+import { resolveVariantForSelection } from '@/lib/variant-selection.mjs';
 
 export default function ProductInteractive({ product, descriptionHtml }) {
   const variants = product.variants || [];
@@ -20,21 +21,21 @@ export default function ProductInteractive({ product, descriptionHtml }) {
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
 
-  const currentVariant = useMemo(() => {
-    if (variants.length === 0) return null;
-    if (optionNames.length === 0) return variants[0];
-    return variants.find(variant => optionNames.every((option, index) => variant[`option${index + 1}`] === selected[option.name])) || variants[0];
-  }, [selected, variants, optionNames]);
+  const currentVariant = useMemo(
+    () => resolveVariantForSelection(variants, optionNames, selected),
+    [selected, variants, optionNames]
+  );
 
   const fmt = value => value ? `$${parseFloat(value).toFixed(0)}` : '';
   const price = fmt(currentVariant?.price);
   const comparePrice = currentVariant?.compare_at_price ? fmt(currentVariant.compare_at_price) : null;
-  const inStock = currentVariant?.available !== false;
+  const inStock = Boolean(currentVariant) && currentVariant.available !== false;
 
   const selectOption = (name, value) => {
     const next = { ...selected, [name]: value };
     setSelected(next);
-    const match = variants.find(variant => optionNames.every((option, index) => variant[`option${index + 1}`] === next[option.name]));
+    setCheckoutError('');
+    const match = resolveVariantForSelection(variants, optionNames, next);
     const imageId = match?.image_id || match?.featured_image?.id;
     const imageSrc = match?.featured_image?.src;
     const imageIndex = images.findIndex(image => (imageId && image.id === imageId) || (imageSrc && (image.src === imageSrc || image.url === imageSrc)));
@@ -45,7 +46,11 @@ export default function ProductInteractive({ product, descriptionHtml }) {
   const mainImgSrc = mainImg?.src || mainImg?.url;
 
   const beginCheckout = async () => {
-    if (!currentVariant || !inStock) return;
+    if (!currentVariant) {
+      setCheckoutError('That option combination is unavailable. Choose another combination before checkout.');
+      return;
+    }
+    if (!inStock) return;
     setCheckingOut(true);
     setCheckoutError('');
     try {
@@ -147,6 +152,9 @@ export default function ProductInteractive({ product, descriptionHtml }) {
           </div>
         ))}
 
+        {!currentVariant && optionNames.length > 0 && (
+          <p className="pdp__checkout-error" role="status">That option combination is unavailable. Choose another combination.</p>
+        )}
         <div className="pdp__cta">
           <button
             type="button"
@@ -156,7 +164,7 @@ export default function ProductInteractive({ product, descriptionHtml }) {
             aria-disabled={!currentVariant || !inStock}
             style={{ opacity: currentVariant && inStock ? 1 : .5, pointerEvents: currentVariant && inStock ? 'auto' : 'none' }}
           >
-            {inStock === false ? 'Sold Out' : checkingOut ? 'Preparing private checkout…' : 'Acquire this piece'}
+            {!currentVariant ? 'Unavailable combination' : inStock === false ? 'Sold Out' : checkingOut ? 'Preparing private checkout…' : 'Acquire this piece'}
           </button>
           <a href="/shop" className="btn-ghost">Continue Shopping</a>
         </div>

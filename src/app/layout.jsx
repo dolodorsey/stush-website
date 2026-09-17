@@ -16,6 +16,7 @@ import { Bodoni_Moda, DM_Mono, DM_Sans } from 'next/font/google';
 import MobileMenu from '@/components/MobileMenu';
 import NavScroll from '@/components/NavScroll';
 import ExperienceLayer from '@/components/ExperienceLayer';
+import InstallAppPrompt from '@/components/InstallAppPrompt';
 
 const serif = Bodoni_Moda({ subsets: ['latin'], weight: ['400','500','600','700'], style: ['normal','italic'], variable: '--font-stush-serif', display: 'swap' });
 const sans = DM_Sans({ subsets: ['latin'], weight: ['300','400','500','700'], variable: '--font-stush-sans', display: 'swap' });
@@ -25,8 +26,12 @@ export const metadata = {
   metadataBase: new URL('https://stushusa.com'),
   title: 'STUSH — Dressed for the Room',
   description: 'An editorial fashion house from Atlanta. Limited pieces, sharp tailoring, street intelligence and clothes designed to hold a room.',
+  applicationName:'STUSH',
+  appleWebApp:{capable:true,title:'STUSH',statusBarStyle:'black-translucent'},
+  icons:{icon:[{url:'/api/pwa-icon?size=192',sizes:'192x192',type:'image/png'},{url:'/api/pwa-icon?size=512',sizes:'512x512',type:'image/png'}],apple:[{url:'/api/pwa-icon?size=180',sizes:'180x180',type:'image/png'}]},
   openGraph: { title: 'STUSH — Dressed for the Room', description: 'An editorial fashion house from Atlanta.', type: 'website', url: 'https://stushusa.com', images: ['/campaigns/stush-real-product.png'] },
 };
+export const viewport={themeColor:'#111111',colorScheme:'dark',width:'device-width',initialScale:1,viewportFit:'cover'};
 
 const NAV = [
   { label: 'Shop', href: '/shop' },
@@ -51,6 +56,7 @@ export default function RootLayout({ children }) {
           <MobileMenu />
         </nav>
         <main>{children}</main>
+        <InstallAppPrompt />
         <footer className="footer">
           <div className="footer__top">
             <div><div className="footer__brand">Stush</div><p className="footer__desc">An editorial house from Atlanta. Pieces for the room, the runway and the people who refuse to dress for everyone else.</p></div>

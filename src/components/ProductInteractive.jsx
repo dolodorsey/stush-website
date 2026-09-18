@@ -16,7 +16,16 @@ export default function ProductInteractive({ product, descriptionHtml }) {
     });
     return initial;
   });
-  const [mainImgIdx, setMainImgIdx] = useState(0);
+  const initialImageIdx = (() => {
+    const imageId = firstAvailable?.image_id || firstAvailable?.featured_image?.id;
+    const imageSrc = firstAvailable?.featured_image?.src;
+    const index = images.findIndex(image =>
+      (imageId && String(image.id) === String(imageId)) ||
+      (imageSrc && (image.src === imageSrc || image.url === imageSrc))
+    );
+    return index >= 0 ? index : 0;
+  })();
+  const [mainImgIdx, setMainImgIdx] = useState(initialImageIdx);
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
 
@@ -37,7 +46,23 @@ export default function ProductInteractive({ product, descriptionHtml }) {
     const match = variants.find(variant => optionNames.every((option, index) => variant[`option${index + 1}`] === next[option.name]));
     const imageId = match?.image_id || match?.featured_image?.id;
     const imageSrc = match?.featured_image?.src;
-    const imageIndex = images.findIndex(image => (imageId && image.id === imageId) || (imageSrc && (image.src === imageSrc || image.url === imageSrc)));
+    let imageIndex = images.findIndex(image =>
+      (imageId && String(image.id) === String(imageId)) ||
+      (imageSrc && (image.src === imageSrc || image.url === imageSrc))
+    );
+
+    // Supplier variants are normally mapped to Shopify media. As a defensive
+    // fallback, products whose images are evenly grouped by color still change
+    // to the matching color family instead of leaving the previous garment up.
+    if (imageIndex < 0 && /colou?r/i.test(name)) {
+      const colorOption = optionNames.find(option => /colou?r/i.test(option.name));
+      const colorIndex = colorOption?.values?.indexOf(value) ?? -1;
+      const groupSize = colorOption?.values?.length && images.length % colorOption.values.length === 0
+        ? images.length / colorOption.values.length
+        : 0;
+      if (colorIndex >= 0 && groupSize > 0) imageIndex = colorIndex * groupSize;
+    }
+
     if (imageIndex >= 0) setMainImgIdx(imageIndex);
   };
 
@@ -72,7 +97,7 @@ export default function ProductInteractive({ product, descriptionHtml }) {
     <div className="pdp">
       <div className="pdp__gallery">
         {mainImgSrc ? (
-          <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4' }}>
+          <div style={{ position: 'relative', width: '100%', aspectRatio: '1/1' }}>
             <Image
               src={mainImgSrc}
               alt={mainImg.alt || mainImg.altText || product.title}
@@ -84,11 +109,11 @@ export default function ProductInteractive({ product, descriptionHtml }) {
             />
           </div>
         ) : (
-          <div className="pdp__img" style={{ aspectRatio: '3/4' }} />
+          <div className="pdp__img" style={{ aspectRatio: '1/1' }} />
         )}
         {images.length > 1 && (
           <div className="pdp__thumb-grid">
-            {images.slice(0, 6).map((img, index) => {
+            {images.slice(0, 12).map((img, index) => {
               const src = img.src || img.url;
               return (
                 <button
@@ -122,7 +147,11 @@ export default function ProductInteractive({ product, descriptionHtml }) {
         </section>
 
         {optionNames.map(option => (
-          <div className="pdp__variants" key={option.name}>
+          <div
+            className="pdp__variants"
+            key={option.name}
+            data-option-name={option.name.toLowerCase()}
+          >
             <span className="pdp__var-label">{option.name}: <em>{selected[option.name]}</em></span>
             <div className="pdp__var-options">
               {option.values.map(value => {
@@ -130,8 +159,10 @@ export default function ProductInteractive({ product, descriptionHtml }) {
                 return (
                   <button
                     key={value}
+                    type="button"
                     onClick={() => selectOption(option.name, value)}
                     className="pdp__var-opt"
+                    data-option-value={value}
                     aria-pressed={isSelected}
                     style={{
                       background: isSelected ? 'var(--ink)' : 'transparent',

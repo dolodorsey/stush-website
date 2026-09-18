@@ -78,14 +78,17 @@ export function getCommerceGalleryImages(product) {
   const lead = getCommerceLeadImage(product);
   const leadSrc = imageSrc(lead);
 
-  const approvedSecondary = images.filter((image, index) => {
-    if (imageSrc(image) === leadSrc) return false;
-    if (isRejected(image, product)) return false;
-    if (index === 0) return true;
-    return isExplicitlyApprovedCommerceImage(image);
-  });
+  // Product pages need the full real Shopify gallery. The previous filter only
+  // accepted secondary images with descriptive alt text, but many POD products
+  // arrive with blank alt text. That hid legitimate color + back-view media and
+  // also prevented variant image switching because the variant's assigned image
+  // was missing from the client-side gallery.
+  const realProductMedia = images.filter(image => imageSrc(image) && !isStockModelImage(image));
+  const result = [
+    lead,
+    ...realProductMedia.filter(image => imageSrc(image) !== leadSrc),
+  ].filter(Boolean);
 
-  const result = [lead, ...approvedSecondary].filter(Boolean);
   const seen = new Set();
   return result.filter(image => {
     const src = imageSrc(image);
@@ -97,7 +100,22 @@ export function getCommerceGalleryImages(product) {
 
 export function getCommerceHoverImage(product) {
   const gallery = getCommerceGalleryImages(product);
-  return gallery[1] || null;
+  if (gallery.length < 2) return null;
+
+  const leadSrc = imageSrc(gallery[0]);
+  const candidates = (product?.images || []).filter(image =>
+    imageSrc(image) &&
+    imageSrc(image) !== leadSrc &&
+    !isStockModelImage(image)
+  );
+
+  // Prefer an explicitly labeled rear view. If supplier media has no alt text,
+  // use the next real product image, which is how STUSH POD front/back pairs are
+  // ordered in Shopify.
+  return candidates.find(image => BACK_VIEW_MEDIA.test(imageText(image)))
+    || candidates[0]
+    || gallery[1]
+    || null;
 }
 
 export function getCommerceCardProduct(product) {

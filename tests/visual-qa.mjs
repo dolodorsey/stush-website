@@ -9,8 +9,13 @@ const categoryKeys = ['women','essentials','outerwear','hoodies','jerseys','tops
 const desktopRoutes = [
   ['home', '/'], ['shop', '/shop'], ['collections', '/collections'], ['lookbook', '/lookbook'], ['journal', '/journal'],
   ...categoryKeys.map(key => [`category-${key}`, `/collections/${key}`]),
+  ['pdp-raglan', '/products/first-string-raglan-jacket'],
+  ['pdp-jersey', '/products/varsity-cut-baseball-jersey'],
 ];
-const mobileRoutes = [['home-mobile','/'],['shop-mobile','/shop'],['women-mobile','/collections/women'],['essentials-mobile','/collections/essentials']];
+const mobileRoutes = [
+  ['home-mobile','/'],['shop-mobile','/shop'],['women-mobile','/collections/women'],['essentials-mobile','/collections/essentials'],
+  ['pdp-raglan-mobile','/products/first-string-raglan-jacket'],
+];
 const tabletRoutes = [['home-tablet','/'],['shop-tablet','/shop'],['outerwear-tablet','/collections/outerwear']];
 const wideRoutes = [['home-wide','/'],['lookbook-wide','/lookbook']];
 
@@ -73,6 +78,99 @@ async function assertCommerceVisibility(page, route) {
   if (route.startsWith('/collections/') && commerce.expectedEditCount !== null && commerce.count !== commerce.expectedEditCount) throw new Error(`${route} renders ${commerce.count} cards but editorial floor expects ${commerce.expectedEditCount}`);
 }
 
+
+async function assertCardHoverBehavior(page, route) {
+  if (route !== '/shop') return;
+  const withHover = page.locator('.stush-product-card[data-has-hover="true"]').first();
+  const withoutHover = page.locator('.stush-product-card[data-has-hover="false"]').first();
+
+  if (await withHover.count()) {
+    await withHover.hover();
+    await page.waitForTimeout(450);
+    const result = await withHover.evaluate(card => {
+      const primary = card.querySelector('.stush-product-card__img--primary');
+      const alternate = card.querySelector('.stush-product-card__img--hover');
+      return {
+        primaryOpacity: primary ? Number.parseFloat(getComputedStyle(primary).opacity || '1') : 0,
+        alternateOpacity: alternate ? Number.parseFloat(getComputedStyle(alternate).opacity || '0') : 0,
+        primarySrc: primary?.currentSrc || primary?.src || '',
+        alternateSrc: alternate?.currentSrc || alternate?.src || '',
+      };
+    });
+    if (result.primaryOpacity > .2 || result.alternateOpacity < .8 || !result.alternateSrc || result.primarySrc === result.alternateSrc) {
+      throw new Error(`/shop hover swap failed: ${JSON.stringify(result)}`);
+    }
+    manifest.checks.push({ route, type:'product-hover-swap', status:'pass' });
+  }
+
+  if (await withoutHover.count()) {
+    await withoutHover.hover();
+    await page.waitForTimeout(450);
+    const opacity = await withoutHover.locator('.stush-product-card__img--primary').evaluate(img => Number.parseFloat(getComputedStyle(img).opacity || '1'));
+    if (opacity < .8) throw new Error(`/shop no-hover product disappeared (opacity ${opacity})`);
+    manifest.checks.push({ route, type:'product-hover-no-blank', status:'pass' });
+  }
+}
+
+async function assertProductVariantInteraction(page, route) {
+  if (!route.startsWith('/products/')) return false;
+
+  const title = page.locator('.pdp__title');
+  await title.waitFor({ state:'visible' });
+
+  const colorGroup = page.locator('.pdp__variants[data-option-name="color"]');
+  if (!(await colorGroup.count())) throw new Error(`${route} has no visible color selector`);
+
+  const colorButtons = colorGroup.locator('.pdp__var-opt');
+  if (await colorButtons.count() < 2) throw new Error(`${route} needs at least two color choices for interaction QA`);
+
+  const beforeSrc = await page.locator('.pdp__img--main').getAttribute('src');
+  const target = colorButtons.nth(1);
+  const targetValue = await target.getAttribute('data-option-value');
+  await target.click();
+  await page.waitForTimeout(500);
+
+  const pressed = await target.getAttribute('aria-pressed');
+  const label = await colorGroup.locator('.pdp__var-label').textContent();
+  const afterSrc = await page.locator('.pdp__img--main').getAttribute('src');
+
+  if (pressed !== 'true' || !targetValue || !label?.includes(targetValue)) {
+    throw new Error(`${route} color selector did not update selected state`);
+  }
+  if (!afterSrc || afterSrc === beforeSrc) {
+    throw new Error(`${route} color selector did not change the garment image`);
+  }
+
+  const sizeGroup = page.locator('.pdp__variants[data-option-name="size"]');
+  if (await sizeGroup.count()) {
+    const sizeButtons = sizeGroup.locator('.pdp__var-opt');
+    if (await sizeButtons.count() > 1) {
+      const sizeTarget = sizeButtons.nth(1);
+      await sizeTarget.click();
+      await page.waitForTimeout(120);
+      if (await sizeTarget.getAttribute('aria-pressed') !== 'true') throw new Error(`${route} size selector did not update`);
+    }
+  }
+
+  const controls = await page.evaluate(() => {
+    const color = document.querySelector('.pdp__variants[data-option-name="color"] .pdp__var-opt[aria-pressed="true"]');
+    const style = color ? getComputedStyle(color) : null;
+    const rect = color?.getBoundingClientRect();
+    return {
+      selectedColor: color?.getAttribute('data-option-value') || '',
+      height: rect?.height || 0,
+      opacity: style ? Number.parseFloat(style.opacity || '1') : 0,
+      visibility: style?.visibility || '',
+    };
+  });
+  if (!controls.selectedColor || controls.height < 40 || controls.opacity < .9 || controls.visibility === 'hidden') {
+    throw new Error(`${route} selector visibility failed: ${JSON.stringify(controls)}`);
+  }
+
+  manifest.checks.push({ route, type:'pdp-variant-interaction', status:'pass', selectedColor:controls.selectedColor });
+  return true;
+}
+
 async function assertEditorialImages(page, route) {
   const result = await page.evaluate(() => {
     const selectors = '.lookbook img,.journal-lead img,.journal-story img,.edit-stage img,.category-landing img,.flag-campaign img,.flag-atelier img,.home-house-world img,.shop-campaign-banner img,.edit-campaign-interlude img,.stush-campaign-art img';
@@ -125,7 +223,33 @@ async function assertCategoryIdentity(page, route) {
 
 async function capture(viewport,routes,{fullPage=true}={}) {
   const context=await browser.newContext({viewport});
-  for(const[name,route]of routes){ const page=await context.newPage(); await openAndAssert(page,route); await warmVisualAssets(page); const screenshotPath=path.join(outDir,`${name}-${viewport.width}x${viewport.height}.png`); await page.screenshot({path:screenshotPath,fullPage}); manifest.captures.push({name,route,viewport,fullPage,file:path.basename(screenshotPath)}); console.log(`Captured ${screenshotPath}`); await assertCommerceVisibility(page,route); await assertEditorialImages(page,route); await assertCampaignRefresh(page,route); await assertNoSuspiciousBlankBlocks(page,route); await assertCategoryIdentity(page,route); if(route==='/')await assertHomepageContract(page); await page.close(); }
+  for(const[name,route]of routes){
+    const page=await context.newPage();
+    await openAndAssert(page,route);
+    await warmVisualAssets(page);
+
+    const screenshotPath=path.join(outDir,`${name}-${viewport.width}x${viewport.height}.png`);
+    await page.screenshot({path:screenshotPath,fullPage});
+    manifest.captures.push({name,route,viewport,fullPage,file:path.basename(screenshotPath)});
+    console.log(`Captured ${screenshotPath}`);
+
+    await assertCommerceVisibility(page,route);
+    await assertCardHoverBehavior(page,route);
+    await assertEditorialImages(page,route);
+    await assertCampaignRefresh(page,route);
+    await assertNoSuspiciousBlankBlocks(page,route);
+    await assertCategoryIdentity(page,route);
+    if(route==='/') await assertHomepageContract(page);
+
+    const variantChanged = await assertProductVariantInteraction(page,route);
+    if (variantChanged) {
+      const variantPath=path.join(outDir,`${name}-variant-${viewport.width}x${viewport.height}.png`);
+      await page.screenshot({path:variantPath,fullPage});
+      manifest.captures.push({name:`${name}-variant`,route,viewport,fullPage,file:path.basename(variantPath)});
+      console.log(`Captured ${variantPath}`);
+    }
+    await page.close();
+  }
   await context.close();
 }
 
@@ -135,5 +259,5 @@ try {
   await capture({width:768,height:1024},tabletRoutes,{fullPage:false});
   await capture({width:1920,height:1080},wideRoutes,{fullPage:false});
   await fs.writeFile(path.join(outDir,'manifest.json'),JSON.stringify(manifest,null,2));
-  console.log(`STUSH visual QA v3 passed. ${manifest.captures.length} screenshots written to ${outDir}`);
+  console.log(`STUSH visual QA v4 passed. ${manifest.captures.length} screenshots written to ${outDir}`);
 } finally { await browser.close(); }

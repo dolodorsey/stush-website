@@ -12,6 +12,7 @@ import './campaign-refresh.css';
 import './house-world-v2.css';
 import './release-qa-fixes.css';
 import './density-pass.css';
+import './commerce-corrections.css';
 import { Bodoni_Moda, DM_Mono, DM_Sans } from 'next/font/google';
 import MobileMenu from '@/components/MobileMenu';
 import NavScroll from '@/components/NavScroll';
@@ -34,10 +35,10 @@ export const metadata = {
 export const viewport={themeColor:'#111111',colorScheme:'dark',width:'device-width',initialScale:1,viewportFit:'cover'};
 
 const NAV = [
-  { label: 'Shop', href: '/shop' },
-  { label: 'Women', href: '/collections/women' },
-  { label: 'Essentials', href: '/collections/essentials' },
   { label: 'Collections', href: '/collections' },
+  { label: 'Shop', href: '/shop' },
+  { label: 'Essentials', href: '/collections/essentials' },
+  { label: 'Women', href: '/collections/women' },
   { label: 'Lookbook', href: '/lookbook' },
   { label: 'Journal', href: '/journal' },
 ];

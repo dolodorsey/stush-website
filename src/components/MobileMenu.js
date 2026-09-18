@@ -2,10 +2,10 @@
 import { useEffect, useState } from 'react';
 
 const LINKS = [
-  { label: 'Shop', href: '/shop' },
-  { label: 'Women', href: '/collections/stush#women' },
-  { label: 'Essentials', href: '/collections/stush#essentials' },
   { label: 'Collections', href: '/collections' },
+  { label: 'Shop', href: '/shop' },
+  { label: 'Essentials', href: '/collections/essentials' },
+  { label: 'Women', href: '/collections/women' },
   { label: 'Lookbook', href: '/lookbook' },
   { label: 'Journal', href: '/journal' },
   { label: 'Bag', href: '/cart' },

@@ -22,7 +22,7 @@ export function isWomenProduct(product) {
 
 export function isEssentialsProduct(product) {
   const text = haystack(product);
-  return /\b(essential|essentials|line:essentials|collection:essentials|status:essential)\b/.test(text);
+  return /\b(essential|essentials|line:essentials|collection:essentials|status:essential|status:core)\b/.test(text);
 }
 
 export function stushCategoryKeys(product) {

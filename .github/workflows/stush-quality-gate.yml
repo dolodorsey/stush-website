@@ -101,11 +101,11 @@ jobs:
 
           VISUAL_BASE_URL=http://127.0.0.1:3000 node tests/visual-qa.mjs
 
-      - name: Upload STUSH visual QA v2 screenshots
+      - name: Upload STUSH visual QA v4 screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: stush-visual-qa-v2-${{ github.sha }}
+          name: stush-visual-qa-v4-${{ github.sha }}
           path: artifacts/visual-qa
           if-no-files-found: error
           retention-days: 30

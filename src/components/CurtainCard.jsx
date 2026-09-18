@@ -15,7 +15,12 @@ export default function CurtainCard({ product, priority = false }) {
   const cleanTitle = product.title?.replace(/^Stush\s*[—-]\s*/i, '') || 'STUSH piece';
 
   return (
-    <a href={productUrl} className="stush-product-card" aria-label={product.title || cleanTitle}>
+    <a
+      href={productUrl}
+      className={`stush-product-card${hasHover ? ' stush-product-card--has-hover' : ''}`}
+      data-has-hover={hasHover ? 'true' : 'false'}
+      aria-label={product.title || cleanTitle}
+    >
       <div className="stush-product-card__media">
         {cover && (
           <Image

@@ -31,6 +31,9 @@ jobs:
       - name: Verify live STUSH catalog pricing and naming
         run: node tests/catalog-qa.mjs
 
+      - name: Verify STUSH variant selection safety
+        run: node tests/variant-selection.test.mjs
+
       - name: Build production app
         run: npm run build
 

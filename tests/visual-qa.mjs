@@ -7,13 +7,13 @@ const outDir = process.env.VISUAL_QA_DIR || 'artifacts/visual-qa';
 const categoryKeys = ['women','essentials','outerwear','hoodies','jerseys','tops','bottoms','accessories'];
 
 const desktopRoutes = [
-  ['home', '/'], ['shop', '/shop'], ['collections', '/collections'], ['lookbook', '/lookbook'], ['journal', '/journal'],
+  ['home', '/'], ['shop', '/shop'], ['collections', '/collections'], ['lookbook', '/lookbook'], ['journal', '/journal'], ['forms-directory', '/forms'],
   ...categoryKeys.map(key => [`category-${key}`, `/collections/${key}`]),
   ['pdp-raglan', '/products/first-string-raglan-jacket'],
   ['pdp-jersey', '/products/varsity-cut-baseball-jersey'],
 ];
 const mobileRoutes = [
-  ['home-mobile','/'],['shop-mobile','/shop'],['women-mobile','/collections/women'],['essentials-mobile','/collections/essentials'],
+  ['home-mobile','/'],['shop-mobile','/shop'],['forms-directory-mobile','/forms'],['women-mobile','/collections/women'],['essentials-mobile','/collections/essentials'],
   ['pdp-raglan-mobile','/products/first-string-raglan-jacket'],
 ];
 const tabletRoutes = [['home-tablet','/'],['shop-tablet','/shop'],['outerwear-tablet','/collections/outerwear']];
@@ -221,6 +221,24 @@ async function assertCategoryIdentity(page, route) {
   if(!identity.category||identity.code<4||identity.floor!==1||identity.campaign!==1) throw new Error(`${route} failed category identity contract: ${JSON.stringify(identity)}`);
 }
 
+async function assertStushIntakeDirectory(page,route) {
+  if(route!=='/forms')return;
+  const directory=page.locator('[data-qa="stush-intake-directory"]');
+  await directory.waitFor({state:'visible'});
+  const paths=['inquiry','sponsor','model','ambassador','host','podcast','promoter','nda'];
+  const links=directory.locator('a[data-stush-intake-path]');
+  if(await links.count()!==paths.length)throw new Error('/forms must expose exactly eight application links');
+  for(const slug of paths) {
+    const link=directory.locator(`a[data-stush-intake-path="/forms/${slug}"]`);
+    if(await link.count()!==1)throw new Error(`Missing or duplicated STUSH intake: ${slug}`);
+    const box=await link.boundingBox();
+    if(!box||box.height<55||box.width<220)throw new Error(`Unusable STUSH intake target: ${slug} ${JSON.stringify(box)}`);
+  }
+  const bg=await directory.locator('.stush-intake__paper').evaluate(el=>getComputedStyle(el).backgroundColor);
+  if(!bg||bg==='rgba(0, 0, 0, 0)')throw new Error('STUSH editorial paper background missing');
+  manifest.checks.push({route,type:'stush-intake-design',status:'pass',links:paths.length});
+}
+
 async function capture(viewport,routes,{fullPage=true}={}) {
   const context=await browser.newContext({viewport});
   for(const[name,route]of routes){
@@ -239,6 +257,7 @@ async function capture(viewport,routes,{fullPage=true}={}) {
     await assertCampaignRefresh(page,route);
     await assertNoSuspiciousBlankBlocks(page,route);
     await assertCategoryIdentity(page,route);
+    await assertStushIntakeDirectory(page,route);
     if(route==='/') await assertHomepageContract(page);
 
     const variantChanged = await assertProductVariantInteraction(page,route);

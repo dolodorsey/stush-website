@@ -29,7 +29,7 @@ jobs:
         run: npm audit --omit=dev --audit-level=high
 
       - name: Verify STUSH contact and application routing
-        run: node --test tests/stush-form-routing.test.mjs
+        run: node --test tests/stush-form-routing.test.mjs tests/stush-intake-design.test.mjs
 
       - name: Verify live STUSH catalog pricing and naming
         run: node tests/catalog-qa.mjs

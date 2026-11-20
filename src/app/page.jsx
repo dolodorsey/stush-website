@@ -1,37 +1,32 @@
 import Image from 'next/image';
-import { getProducts, SHOP_URL, formatPrice } from '@/lib/shopify';
-import CurtainCard from '@/components/CurtainCard';
-import SecondaryHouseFilm from '@/components/SecondaryHouseFilm';
+import { getProducts, SHOP_URL } from '@/lib/shopify';
+import ShopCard from '@/components/ShopCard';
 import { STUSH_CATEGORIES, groupStushProducts, sortStushProducts } from '@/lib/stush-categories';
-import { getCommerceCardProduct, getCommerceLeadImage } from '@/lib/stush-merchandising';
 import { STUSH_CATEGORY_CAMPAIGN, STUSH_HOUSE_WORLD } from '@/lib/stush-campaign-assets';
+import { toShopCard } from '@/lib/stush-shop-cards';
 
 export const dynamic = 'force-dynamic';
 
-function imageSrc(product) {
-  const image = getCommerceLeadImage(product);
-  return image?.src || image?.url || null;
-}
-
-function pieceCount(count) {
-  return `${count} ${count === 1 ? 'PIECE' : 'PIECES'}`;
-}
+const TILE_ORDER = ['women', 'outerwear', 'jerseys', 'hoodies', 'tops', 'bottoms', 'essentials', 'accessories'];
 
 export default async function HomePage() {
-  const allProducts = sortStushProducts(await getProducts({ limit: 250 }));
-  const grouped = groupStushProducts(allProducts);
-  const withImages = allProducts.filter(product => imageSrc(product));
-  const featured = withImages.slice(0, 8).map(getCommerceCardProduct);
-  const rail = withImages.slice(0, 14).map(getCommerceCardProduct);
-  const shopChapters = STUSH_CATEGORIES
-    .map(category => ({ ...category, products: grouped[category.key] || [] }))
-    .filter(category => category.products.length || ['essentials', 'women'].includes(category.key));
-  const visualChapters = ['women', 'jerseys', 'tops', 'outerwear']
-    .map(key => shopChapters.find(chapter => chapter.key === key))
-    .filter(Boolean);
+  const raw = sortStushProducts(await getProducts({ limit: 250 }));
+  const grouped = groupStushProducts(raw);
+  const cards = raw.map(toShopCard).filter(card => card.cover);
+  const inStock = cards.filter(card => card.available);
+  const newest = [...inStock].sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || ''))).slice(0, 8);
+  const shown = new Set(newest.map(card => card.id));
+
+  const counts = Object.fromEntries(STUSH_CATEGORIES.map(category => [category.key, (grouped[category.key] || []).length]));
+  const tiles = TILE_ORDER.filter(key => counts[key] > 0 && STUSH_CATEGORY_CAMPAIGN[key]).slice(0, 4)
+    .map(key => ({ ...STUSH_CATEGORIES.find(category => category.key === key), count: counts[key], art: STUSH_CATEGORY_CAMPAIGN[key] }));
+
+  const spotlightKey = ['outerwear', 'hoodies', 'jerseys', 'tops'].find(key => inStock.filter(card => card.categories.includes(key) && !shown.has(card.id)).length >= 4);
+  const spotlight = spotlightKey ? STUSH_CATEGORIES.find(category => category.key === spotlightKey) : null;
+  const spotlightCards = spotlight ? inStock.filter(card => card.categories.includes(spotlightKey) && !shown.has(card.id)).slice(0, 8) : [];
 
   return (
-    <div className="flagship">
+    <div className="sf-home">
       {/* LOCKED: the homepage landing film stays exactly separate, wordless and unchanged. */}
       <section className="flag-hero" data-qa="animation-hero" aria-label="STUSH campaign film">
         <video
@@ -47,140 +42,79 @@ export default async function HomePage() {
         />
       </section>
 
-      {rail.length > 0 && (
-        <section className="stush-shop-rail" data-qa="shop-rail" aria-label="Shop STUSH">
-          <a href="/shop" className="stush-shop-rail__label">
-            <span>SHOP NOW</span>
-            <strong>{withImages.length} PIECES · VIEW ALL ↗</strong>
-          </a>
-          <div className="stush-shop-rail__track">
-            {rail.map((product, index) => {
-              const cover = product.coverImage?.src || product.coverImage?.url;
-              return (
-                <a key={product.id} href={`/products/${product.handle}`} className="stush-shop-rail__item">
-                  <span className="stush-shop-rail__img">
-                    {cover && <Image src={cover} alt={product.title} fill sizes="140px" priority={index < 6} />}
-                  </span>
-                  <span className="stush-shop-rail__name">{product.title.replace(/^Stush\s*[—-]\s*/i, '')}</span>
-                  <span className="stush-shop-rail__price">{formatPrice(product.price)}</span>
-                </a>
-              );
-            })}
+      <nav className="sf-bar sf-bar--sticky sf-bar--home" aria-label="Shop by category">
+        <div className="sf-chips">
+          <a href="/shop" className="is-on">Shop all <small>{cards.length}</small></a>
+          {STUSH_CATEGORIES.filter(category => counts[category.key] > 0).map(category => (
+            <a key={category.key} href={`/shop#${category.key}`}>{category.label} <small>{counts[category.key]}</small></a>
+          ))}
+        </div>
+      </nav>
+
+      <section className="sf-section sf-section--first" data-qa="home-new-in">
+        <header className="sf-head">
+          <div>
+            <span className="sf-kicker">Fall / Winter 26 · Atlanta</span>
+            <h1>New in.</h1>
+          </div>
+          <a href="/shop" className="sf-link">Shop all {cards.length} pieces →</a>
+        </header>
+        <div className="sf-grid">
+          {newest.map((card, index) => <ShopCard key={card.id} product={card} priority={index < 4} />)}
+        </div>
+      </section>
+
+      {tiles.length > 0 && (
+        <section className="sf-section sf-section--tight" aria-label="Shop by category">
+          <header className="sf-head">
+            <div><span className="sf-kicker">The wardrobe</span><h2>Shop by category.</h2></div>
+          </header>
+          <div className={`sf-tiles sf-tiles--${tiles.length}`}>
+            {tiles.map(tile => (
+              <a key={tile.key} href={`/shop#${tile.key}`} className="sf-tile">
+                <Image src={tile.art.src} alt={tile.art.alt} fill sizes="(max-width: 700px) 50vw, 25vw" />
+                <span className="sf-tile__veil" />
+                <span className="sf-tile__label"><strong>{tile.label}</strong><small>{tile.count} pieces →</small></span>
+              </a>
+            ))}
           </div>
         </section>
       )}
 
-      <section className="flag-product-edit flag-product-edit--first">
-        <div className="flag-section-head">
-          <div><span className="flag-kicker">SHOP NOW</span><h2>THE CURRENT<br/>EDIT.</h2></div>
-          <a href="/shop" className="flag-link">VIEW ALL PIECES ↗</a>
-        </div>
-        <div className="flag-product-grid">{featured.map((product, index) => <CurtainCard key={product.id} product={product} priority={index < 4} />)}</div>
-      </section>
-
-      <section className="flag-intro" data-qa="post-hero-copy">
-        <div className="flag-intro__headline">
-          <span className="flag-kicker">FALL / WINTER 26 · ATLANTA</span>
-          <h1><span>DRESSED FOR</span><em>THE ROOM.</em></h1>
-        </div>
-        <div className="flag-intro__aside">
-          <p>STUSH is built around presence: strong silhouettes, limited edits and clothes that hold a room.</p>
-          <div className="flag-intro__actions">
-            <a href="/shop" className="flag-btn flag-btn--dark">SHOP THE FALL EDIT</a>
-            <a href="/lookbook" className="flag-link">VIEW LOOKBOOK ↗</a>
+      {spotlight && (
+        <section className="sf-section" aria-label={spotlight.label}>
+          <header className="sf-head">
+            <div><span className="sf-kicker">{spotlight.eyebrow}</span><h2>{spotlight.label}.</h2></div>
+            <a href={`/shop#${spotlight.key}`} className="sf-link">Shop {spotlight.label.toLowerCase()} →</a>
+          </header>
+          <div className="sf-grid">
+            {spotlightCards.map(card => <ShopCard key={card.id} product={card} />)}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      <section
-        className="home-motion-world stush-house-backdrop"
-        style={{ '--stush-house-bg': `url(${STUSH_HOUSE_WORLD.dressingRoom.src})` }}
-        data-qa="home-secondary-motion"
-      >
-        <div className="home-motion-world__copy">
-          <span className="flag-kicker">HOUSE MOTION / 002</span>
-          <h2>THE BRAND<br/><em>DOESN'T STOP</em><br/>AT PRODUCT.</h2>
-          <p>The atmosphere around STUSH should feel as deliberate as the garments: after-dark rooms, reflective surfaces, black satin, city light and private access.</p>
-          <a href="/lookbook" className="flag-link">ENTER THE HOUSE WORLD ↗</a>
-        </div>
-        <SecondaryHouseFilm className="home-motion-world__film" label="STUSH secondary house animation" />
-      </section>
-
-      <section className="flag-campaigns stush-campaign-art" data-qa="campaign-chapters">
-        <header><span className="flag-kicker">THE WARDROBE / FALL 26</span><h2>THE CLOTHES<br/><em>COME ALIVE.</em></h2></header>
-        <div className="flag-campaigns__grid">
-          {visualChapters.map((chapter, index) => {
-            const campaign = STUSH_CATEGORY_CAMPAIGN[chapter.key];
-            return (
-              <a href={`/collections/${chapter.key}`} className={`flag-campaign flag-campaign--${index + 1}`} key={chapter.key}>
-                {campaign && <Image src={campaign.src} alt={campaign.alt} fill sizes="(max-width: 760px) 100vw, 50vw" priority={index === 0} />}
-                <span className="campaign-veil" />
-                <div><span>{chapter.eyebrow}</span><strong>{chapter.label}</strong><i>↗</i></div>
-              </a>
-            );
-          })}
-        </div>
-      </section>
-
-      <section
-        className="flag-index stush-house-backdrop stush-house-backdrop--quiet"
-        style={{ '--stush-house-bg': `url(${STUSH_HOUSE_WORLD.chrome.src})` }}
-      >
-        <header><span className="flag-kicker">THE WARDROBE</span><h2>SHOP BY<br/>CATEGORY.</h2></header>
-        <div className="flag-index__list">
-          {shopChapters.map((section, index) => (
-            <a key={section.key} href={`/collections/${section.key}`}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <strong>{section.label}</strong>
-              <em>{section.products.length ? pieceCount(section.products.length) : 'FALL EDIT INCOMING'}</em>
-              <i>↗</i>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      <section className="home-house-world stush-campaign-art" data-qa="house-world">
-        <a className="home-house-world__lead" href="/lookbook">
-          <Image src={STUSH_HOUSE_WORLD.crystal.src} alt={STUSH_HOUSE_WORLD.crystal.alt} fill sizes="(max-width: 860px) 100vw, 68vw" />
-          <span className="campaign-veil" />
-          <div><span className="flag-kicker">STUSH / HOUSE WORLD 001</span><h2>THE WORLD<br/><em>AROUND THE CLOTHES.</em></h2><p>A visual language of black satin, chrome, stone and after-dark rooms.</p><strong>ENTER THE LOOKBOOK ↗</strong></div>
-        </a>
-        <a className="home-house-world__side" href="/journal">
-          <Image src={STUSH_HOUSE_WORLD.chrome.src} alt={STUSH_HOUSE_WORLD.chrome.alt} fill sizes="(max-width: 860px) 100vw, 32vw" />
-          <span className="campaign-veil" />
-          <div><span>HOUSE OBJECTS / 01</span><strong>READ THE HOUSE NOTES ↗</strong></div>
-        </a>
-      </section>
-
-      <section
-        className="flag-thesis stush-house-backdrop stush-house-backdrop--thesis"
-        style={{ '--stush-house-bg': `url(${STUSH_HOUSE_WORLD.roses.src})` }}
-      >
-        <span className="flag-kicker">STUSH / HOUSE CODE 001</span>
-        <div className="flag-thesis__grid">
-          <h2>NOT MADE<br/>TO BLEND IN.</h2>
-          <div><p>Atlanta confidence translated into a focused wardrobe: better proportion, stronger silhouettes and fewer pieces with more purpose.</p><a href="/journal" className="flag-link">READ THE HOUSE NOTES ↗</a></div>
-        </div>
-      </section>
-
-      <section className="flag-atelier stush-campaign-art">
+      <a href="/lookbook" className="sf-banner">
         <Image src={STUSH_HOUSE_WORLD.rainyBoutique.src} alt={STUSH_HOUSE_WORLD.rainyBoutique.alt} fill sizes="100vw" />
-        <div className="flag-atelier__veil" />
-        <div className="flag-atelier__copy"><span className="flag-kicker">THE HOUSE / AFTER DARK</span><h2>BUILT FOR<br/><em>THE NEXT ROOM.</em></h2><p>The wardrobe is only part of STUSH. The world around it should feel just as considered.</p><div><a href="/collections" className="flag-btn flag-btn--light">ENTER COLLECTIONS</a><a href="/lookbook" className="flag-link">VIEW THE EDIT ↗</a></div></div>
-      </section>
+        <span className="sf-banner__veil" />
+        <span className="sf-banner__copy">
+          <span className="sf-kicker">The house world</span>
+          <strong>Dressed for <em>the room.</em></strong>
+          <span className="sf-link sf-link--light">View the lookbook →</span>
+        </span>
+      </a>
 
-      <section
-        className="flag-society stush-house-backdrop stush-house-backdrop--society"
-        style={{ '--stush-house-bg': `url(${STUSH_HOUSE_WORLD.dressingRoom.src})` }}
-        id="society"
-      >
-        <span className="flag-kicker">PRIVATE ACCESS</span><h2>KNOW BEFORE<br/><em>THE ROOM DOES.</em></h2><p>Fall drops, first access, campaign releases and private invitations.</p>
+      <section className="sf-signup" id="society">
+        <div>
+          <span className="sf-kicker">Private access</span>
+          <h2>First to the drop.</h2>
+          <p>New pieces, restocks and private invitations — before anyone else.</p>
+        </div>
         <form action={`${SHOP_URL}/contact#contact_form`} method="POST">
           <input type="hidden" name="form_type" value="customer" />
           <input type="hidden" name="utf8" value="✓" />
-          <input type="hidden" name="contact[tags]" value="newsletter,stush,society" />
-          <input type="email" name="contact[email]" placeholder="EMAIL ADDRESS" required autoComplete="email" aria-label="Email address" />
-          <button type="submit">JOIN ↗</button>
+          <input type="hidden" name="contact[tags]" value="newsletter,stush,society,stush-newsletter" />
+          <input type="email" name="contact[email]" placeholder="Email address" required autoComplete="email" aria-label="Email address" />
+          <button type="submit">Join</button>
         </form>
       </section>
     </div>

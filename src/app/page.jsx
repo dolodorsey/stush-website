@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { getProducts, SHOP_URL } from '@/lib/shopify';
+import { getProducts, SHOP_URL, formatPrice } from '@/lib/shopify';
 import CurtainCard from '@/components/CurtainCard';
 import SecondaryHouseFilm from '@/components/SecondaryHouseFilm';
 import { STUSH_CATEGORIES, groupStushProducts, sortStushProducts } from '@/lib/stush-categories';
@@ -20,7 +20,9 @@ function pieceCount(count) {
 export default async function HomePage() {
   const allProducts = sortStushProducts(await getProducts({ limit: 250 }));
   const grouped = groupStushProducts(allProducts);
-  const featured = allProducts.filter(product => imageSrc(product)).slice(0, 8).map(getCommerceCardProduct);
+  const withImages = allProducts.filter(product => imageSrc(product));
+  const featured = withImages.slice(0, 8).map(getCommerceCardProduct);
+  const rail = withImages.slice(0, 14).map(getCommerceCardProduct);
   const shopChapters = STUSH_CATEGORIES
     .map(category => ({ ...category, products: grouped[category.key] || [] }))
     .filter(category => category.products.length || ['essentials', 'women'].includes(category.key));
@@ -45,6 +47,37 @@ export default async function HomePage() {
         />
       </section>
 
+      {rail.length > 0 && (
+        <section className="stush-shop-rail" data-qa="shop-rail" aria-label="Shop STUSH">
+          <a href="/shop" className="stush-shop-rail__label">
+            <span>SHOP NOW</span>
+            <strong>{withImages.length} PIECES · VIEW ALL ↗</strong>
+          </a>
+          <div className="stush-shop-rail__track">
+            {rail.map((product, index) => {
+              const cover = product.coverImage?.src || product.coverImage?.url;
+              return (
+                <a key={product.id} href={`/products/${product.handle}`} className="stush-shop-rail__item">
+                  <span className="stush-shop-rail__img">
+                    {cover && <Image src={cover} alt={product.title} fill sizes="140px" priority={index < 6} />}
+                  </span>
+                  <span className="stush-shop-rail__name">{product.title.replace(/^Stush\s*[—-]\s*/i, '')}</span>
+                  <span className="stush-shop-rail__price">{formatPrice(product.price)}</span>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      <section className="flag-product-edit flag-product-edit--first">
+        <div className="flag-section-head">
+          <div><span className="flag-kicker">SHOP NOW</span><h2>THE CURRENT<br/>EDIT.</h2></div>
+          <a href="/shop" className="flag-link">VIEW ALL PIECES ↗</a>
+        </div>
+        <div className="flag-product-grid">{featured.map((product, index) => <CurtainCard key={product.id} product={product} priority={index < 4} />)}</div>
+      </section>
+
       <section className="flag-intro" data-qa="post-hero-copy">
         <div className="flag-intro__headline">
           <span className="flag-kicker">FALL / WINTER 26 · ATLANTA</span>
@@ -57,14 +90,6 @@ export default async function HomePage() {
             <a href="/lookbook" className="flag-link">VIEW LOOKBOOK ↗</a>
           </div>
         </div>
-      </section>
-
-      <section className="flag-product-edit flag-product-edit--first">
-        <div className="flag-section-head">
-          <div><span className="flag-kicker">SHOP NOW</span><h2>THE CURRENT<br/>EDIT.</h2></div>
-          <a href="/shop" className="flag-link">VIEW ALL PIECES ↗</a>
-        </div>
-        <div className="flag-product-grid">{featured.map((product, index) => <CurtainCard key={product.id} product={product} priority={index < 4} />)}</div>
       </section>
 
       <section

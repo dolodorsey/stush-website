@@ -14,6 +14,7 @@ import './release-qa-fixes.css';
 import './density-pass.css';
 import './commerce-corrections.css';
 import './stush-intake-directory.css';
+import './shop-first.css';
 import { Bodoni_Moda, DM_Mono, DM_Sans } from 'next/font/google';
 import MobileMenu from '@/components/MobileMenu';
 import NavScroll from '@/components/NavScroll';

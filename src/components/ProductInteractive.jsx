@@ -187,12 +187,12 @@ export default function ProductInteractive({ product, descriptionHtml }) {
             aria-disabled={!currentVariant || !inStock}
             style={{ opacity: currentVariant && inStock ? 1 : .5, pointerEvents: currentVariant && inStock ? 'auto' : 'none' }}
           >
-            {inStock === false ? 'Sold Out' : checkingOut ? 'Preparing private checkout…' : 'Acquire this piece'}
+            {inStock === false ? 'Sold Out' : checkingOut ? 'Opening checkout…' : 'Buy now'}
           </button>
           <a href="/shop" className="btn-ghost">Continue Shopping</a>
         </div>
         {checkoutError && <p className="pdp__checkout-error" role="alert">{checkoutError}</p>}
-        <div className="pdp__assurance" aria-label="Purchase assurances"><span>Live edition verification</span><span>Secure private checkout</span><span>Curated fulfillment</span></div>
+        <div className="pdp__assurance" aria-label="Purchase assurances"><span>Free US shipping on $70+</span><span>Shop Pay · PayPal · Venmo · Cards</span><span>Limited runs</span></div>
         <div className="pdp__details">
           <span className="eyebrow">Details</span>
           <div className="meta pdp__details-grid">
